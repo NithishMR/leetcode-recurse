@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DifficultyDropdown } from "./DifficultyDropdown";
@@ -12,11 +12,12 @@ interface Problem {
   problemName: string;
   problemUrl: string;
   difficulty: string;
-  platform: string;
+  source: string; // renamed from platform to match backend
   notes: string;
-  dateSolved: string; // or Date if you store it as Date
+  dateSolved: string;
 }
 
+// TextArea component
 export function TextArea({
   value,
   onChange,
@@ -35,64 +36,49 @@ export function TextArea({
 }
 
 const ProblemAdditionPage = () => {
-  // Form States
+  // Form states
   const [problemName, setProblemName] = useState<string>("");
   const [problemUrl, setProblemUrl] = useState<string>("");
   const [difficulty, setDifficulty] = useState<string>("Easy");
-  const [platform, setPlatform] = useState<string>("");
+  const [source, setSource] = useState<string>(""); // renamed platform -> source
   const [notes, setNotes] = useState<string>("");
   const [dateSolved, setDateSolved] = useState<Date | undefined>(undefined);
 
-  // Data Fetch States
-  const [problemData, setProblemData] = useState<Problem[] | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  // Simulate fetching problems from MongoDB
-  useEffect(() => {
-    const fetchProblems = async () => {
-      setLoading(true);
-      try {
-        // Replace with your API call later
-        // const res = await fetch("/api/problems");
-        // const data = await res.json();
-        const data: Problem[] = []; // empty array for now
-        setProblemData(data);
-      } catch (error) {
-        console.error(error);
-        setProblemData([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProblems();
-  }, []);
-
-  const handleAddProblem = () => {
-    const newProblem: Problem = {
+  // Handle form submission
+  const handleAddProblem = async () => {
+    const newProblem = {
       problemName,
       problemUrl,
       difficulty,
-      platform,
+      source, // normalize case
       notes,
-      dateSolved: dateSolved ? dateSolved.toISOString() : "",
+      dateSolved: dateSolved ? dateSolved.toISOString() : undefined,
     };
 
-    // For now, just log it and update local state
-    console.log("Problem Added:", newProblem);
-    setProblemData((prev) => (prev ? [...prev, newProblem] : [newProblem]));
+    try {
+      const res = await fetch("/api/problems", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newProblem),
+      });
 
-    // Reset form fields
-    setProblemName("");
-    setProblemUrl("");
-    setDifficulty("Easy");
-    setPlatform("");
-    setNotes("");
-    setDateSolved(undefined);
+      const saved = await res.json();
+      console.log("Problem saved:", saved);
+
+      // Reset form fields
+      setProblemName("");
+      setProblemUrl("");
+      setDifficulty("Easy");
+      setSource("");
+      setNotes("");
+      setDateSolved(undefined);
+    } catch (error) {
+      console.error("Error saving problem:", error);
+    }
   };
-
+  console.log("Mongodb url: ", process.env.MONGODB_URI);
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-start p-6 space-y-8">
-      {/* Form Container */}
       <div className="w-full max-w-4xl bg-white shadow-xl rounded-2xl p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
         <h1 className="col-span-1 md:col-span-2 text-3xl font-bold text-gray-800 text-center mb-6">
           Add a New Problem
@@ -112,7 +98,6 @@ const ProblemAdditionPage = () => {
             placeholder="Example: Two Sum"
             value={problemName}
             onChange={(e) => setProblemName(e.target.value)}
-            className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
         </div>
 
@@ -130,7 +115,6 @@ const ProblemAdditionPage = () => {
             placeholder="https://url"
             value={problemUrl}
             onChange={(e) => setProblemUrl(e.target.value)}
-            className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           />
         </div>
 
@@ -145,22 +129,21 @@ const ProblemAdditionPage = () => {
           <DifficultyDropdown value={difficulty} onChange={setDifficulty} />
         </div>
 
-        {/* Platform */}
+        {/* Platform / Source */}
         <div className="flex flex-col">
-          <Label htmlFor="platform" className="mb-1 text-gray-700 font-medium">
+          <Label htmlFor="source" className="mb-1 text-gray-700 font-medium">
             Platform Name
           </Label>
           <Input
-            id="platform"
+            id="source"
             type="text"
             placeholder="Example: LeetCode"
-            value={platform}
-            onChange={(e) => setPlatform(e.target.value)}
-            className="border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            value={source}
+            onChange={(e) => setSource(e.target.value)}
           />
         </div>
 
-        {/* Notes (full width) */}
+        {/* Notes */}
         <div className="flex flex-col md:col-span-2">
           <Label htmlFor="notes" className="mb-1 text-gray-700 font-medium">
             Notes / Key Trick
@@ -190,19 +173,6 @@ const ProblemAdditionPage = () => {
             Add Problem
           </Button>
         </div>
-      </div>
-
-      {/* Problems Display */}
-      <div className="w-full max-w-4xl space-y-4">
-        {loading ? (
-          <div className="text-center text-gray-500">Loading...</div>
-        ) : problemData && problemData.length > 0 ? (
-          <pre className="bg-gray-100 p-4 rounded-lg overflow-x-auto">
-            {JSON.stringify(problemData, null, 2)}
-          </pre>
-        ) : (
-          <div className="text-center text-gray-500">No problems found</div>
-        )}
       </div>
     </div>
   );
