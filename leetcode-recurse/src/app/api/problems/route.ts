@@ -10,7 +10,6 @@ export async function POST(request: Request) {
     const { problemName, problemUrl, source, difficulty, dateSolved, notes } =
       body;
 
-    // Create a new problem document
     const problem = await Problem.create({
       problemName,
       problemUrl,
@@ -25,6 +24,22 @@ export async function POST(request: Request) {
     console.error("Error creating problem:", error);
     return NextResponse.json(
       { error: "Failed to create problem" },
+      { status: 500 }
+    );
+  }
+}
+export async function GET() {
+  try {
+    await connectDB();
+
+    const problems = await Problem.find().sort({ dateSolved: -1 }); // newest first
+    // console.log(problems);
+
+    return NextResponse.json(problems, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching problems:", error);
+    return NextResponse.json(
+      { message: "Failed to fetch problems" },
       { status: 500 }
     );
   }

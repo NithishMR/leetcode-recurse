@@ -1,0 +1,18 @@
+{
+  "_id": {
+    "$oid": "68fcda750c273a25ace2832f"
+  },
+  "problemName": "Two Sum",
+  "problemUrl": "https://leetcode.com/problems/calculate-money-in-leetcode-bank/",
+  "difficulty": "Medium",
+  "source": "Leetcode",
+  "notes": "Hamd",
+  "dateSolved": {
+    "$date": "2025-10-23T18:30:00.000Z"
+  },
+  "status": "Active",
+  "nextReviewDate": {
+    "$date": "2025-11-01T14:11:01.221Z"
+  },
+  "__v": 0
+}

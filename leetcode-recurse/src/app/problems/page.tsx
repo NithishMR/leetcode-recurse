@@ -76,7 +76,6 @@ const ProblemAdditionPage = () => {
       console.error("Error saving problem:", error);
     }
   };
-  console.log("Mongodb url: ", process.env.MONGODB_URI);
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-start p-6 space-y-8">
       <div className="w-full max-w-4xl bg-white shadow-xl rounded-2xl p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
