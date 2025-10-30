@@ -6,6 +6,7 @@ import { DifficultyDropdown } from "./DifficultyDropdown";
 import { Textarea } from "@/components/ui/textarea";
 import { CalendarPicker } from "./DateSolved";
 import { Button } from "@/components/ui/button";
+import { PlatformDropdown } from "./PlatformDropdown";
 
 interface Problem {
   _id?: string;
@@ -129,7 +130,7 @@ const ProblemAdditionPage = () => {
         </div>
 
         {/* Platform / Source */}
-        <div className="flex flex-col">
+        {/* <div className="flex flex-col">
           <Label htmlFor="source" className="mb-1 text-gray-700 font-medium">
             Platform Name
           </Label>
@@ -140,6 +141,12 @@ const ProblemAdditionPage = () => {
             value={source}
             onChange={(e) => setSource(e.target.value)}
           />
+        </div> */}
+        <div className="flex flex-col">
+          <Label htmlFor="source" className="mb-1 text-gray-700 font-medium">
+            Platform Name
+          </Label>
+          <PlatformDropdown value={source} onChange={setSource} />
         </div>
 
         {/* Notes */}

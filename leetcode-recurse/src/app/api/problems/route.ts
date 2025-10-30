@@ -28,18 +28,32 @@ export async function POST(request: Request) {
     );
   }
 }
-export async function GET() {
+
+export async function GET(request: Request) {
   try {
     await connectDB();
 
-    const problems = await Problem.find().sort({ dateSolved: -1 }); // newest first
-    // console.log(problems);
+    const { searchParams } = new URL(request.url);
+    const page = Number(searchParams.get("page")) || 1;
+    const limit = Number(searchParams.get("limit")) || 10;
 
-    return NextResponse.json(problems, { status: 200 });
+    const skip = (page - 1) * limit;
+
+    const problems = await Problem.find()
+      .sort({ dateSolved: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await Problem.countDocuments();
+
+    return NextResponse.json({
+      problems,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+    });
   } catch (error) {
-    console.error("Error fetching problems:", error);
     return NextResponse.json(
-      { message: "Failed to fetch problems" },
+      { error: "Failed to fetch problems" },
       { status: 500 }
     );
   }

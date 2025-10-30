@@ -32,9 +32,9 @@ export function DifficultyDropdown({
         <DropdownMenuLabel>Difficulty</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup value={value} onValueChange={onChange}>
-          <DropdownMenuRadioItem value="Easy">Easy</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="Medium">Medium</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="Hard">Hard</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="easy">Easy</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="medium">Medium</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="hard">Hard</DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>

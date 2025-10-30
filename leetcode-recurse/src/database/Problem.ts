@@ -6,7 +6,7 @@ const ProblemSchema = new mongoose.Schema({
   problemUrl: { type: String, required: true },
   difficulty: {
     type: String,
-    enum: ["Easy", "Medium", "Hard"],
+    enum: ["easy", "medium", "hard"],
     required: true,
   },
   source: {
@@ -16,11 +16,14 @@ const ProblemSchema = new mongoose.Schema({
 
   notes: { type: String, default: "" },
   dateSolved: { type: Date, default: Date.now },
+  timesSolved: {
+    type: Number,
+    default: 1,
+  },
   nextReviewDate: {
     type: Date,
     default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
   },
-  status: { type: String, default: "Active" },
 });
 
 const Problem =
