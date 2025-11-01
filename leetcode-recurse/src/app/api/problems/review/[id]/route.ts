@@ -17,7 +17,8 @@ export async function POST(req: Request, context: { params: { id: string } }) {
 
     problem.timesSolved = (problem.timesSolved || 0) + 1;
 
-    const daysToAdd = getSpacing(problem.timesSolved);
+    // const daysToAdd = getSpacing(problem.timesSolved);
+    const daysToAdd = 7;
     const newDate = new Date();
     newDate.setDate(newDate.getDate() + daysToAdd);
 
