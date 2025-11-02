@@ -22,7 +22,6 @@ const ProblemSchema = new mongoose.Schema({
   },
   nextReviewDate: {
     type: Date,
-    default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
   },
   lastEmailSentDate: { type: Date, default: null },
 });

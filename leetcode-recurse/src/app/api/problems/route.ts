@@ -7,16 +7,24 @@ export async function POST(request: Request) {
     await connectDB();
 
     const body = await request.json();
-    const { problemName, problemUrl, source, difficulty, dateSolved, notes } =
-      body;
+    const {
+      problemName,
+      problemUrl,
+      source,
+      difficulty,
+      dateSolved,
+      notes,
+      nextReviewDate,
+    } = body;
 
     const problem = await Problem.create({
       problemName,
       problemUrl,
-      difficulty,
+      difficulty: difficulty.toLowerCase(),
       source,
       notes,
       dateSolved,
+      nextReviewDate,
     });
 
     return NextResponse.json(problem, { status: 201 });
@@ -54,6 +62,37 @@ export async function GET(request: Request) {
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to fetch problems" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    await connectDB();
+
+    const { _id } = await request.json();
+    if (!_id) {
+      return NextResponse.json(
+        { error: "Problem ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const deleted = await Problem.findByIdAndDelete(_id);
+
+    if (!deleted) {
+      return NextResponse.json({ error: "Problem not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(
+      { message: "Problem deleted successfully" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error deleting problem:", error);
+    return NextResponse.json(
+      { error: "Failed to delete problem" },
       { status: 500 }
     );
   }

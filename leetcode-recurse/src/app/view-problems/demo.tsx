@@ -30,6 +30,7 @@ import Details from "../../../public/Details.svg";
 import Edit from "../../../public/Edit.svg";
 import Delete from "../../../public/Delete.svg";
 import CheckBox from "../../../public/checkbox.svg";
+
 type ProblemDataStructure = {
   _id: string;
   problemName: string;
@@ -41,6 +42,7 @@ type ProblemDataStructure = {
   timesSolved: number;
   nextReviewDate: string;
 };
+
 function ProblemsViewPage() {
   const [totalPages, setTotalPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -56,26 +58,18 @@ function ProblemsViewPage() {
 
     fetchPage();
   }, [currentPage]);
+
   const handleReviewed = async (id: string) => {
     const res = await fetch(`/api/problems/review/${id}`, {
       method: "POST",
     });
 
     if (res.ok) {
-      //processDataRetrieval(); // refresh data after update
-      // retrieve the data
       console.log("changed successfully");
+      location.reload();
     }
   };
 
-  const getReviewStatus = (nextDate: string, noOfTimesSolved: number) => {
-    const today = new Date();
-    const next = new Date(nextDate);
-    if (noOfTimesSolved >= 7) return "Retired ";
-    if (next > today) return "Active ";
-    if (next.toDateString() === today.toDateString()) return "Due Today";
-    return "Missed ";
-  };
   const handleProblemDelete = async (_id: string) => {
     const res = await fetch(`/api/problems/`, {
       method: "DELETE",
@@ -86,6 +80,15 @@ function ProblemsViewPage() {
       console.log("changed successfully");
       location.reload();
     }
+  };
+
+  const getReviewStatus = (nextDate: string, noOfTimesSolved: number) => {
+    const today = new Date();
+    const next = new Date(nextDate);
+    if (noOfTimesSolved >= 7) return "Retired ";
+    if (next > today) return "Active ";
+    if (next.toDateString() === today.toDateString()) return "Due Today";
+    return "Missed ";
   };
 
   return (
@@ -104,7 +107,6 @@ function ProblemsViewPage() {
               <TableHead>Difficulty</TableHead>
               <TableHead>Date Solved</TableHead>
               <TableHead>Status</TableHead>
-              {/* <TableHead>Times Reviewed</TableHead> */}
               <TableHead>ACTIONS</TableHead>
             </TableRow>
           </TableHeader>
@@ -122,11 +124,11 @@ function ProblemsViewPage() {
                   <TableCell className="font-medium">
                     <Link href={datum.problemUrl} target="_blank">
                       <div className="flex items-center gap-4">
-                        <img
+                        <Image
                           src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${datum.source}.com&size=64`}
                           alt="platform icon"
-                          width="25"
-                          height="25"
+                          width={25}
+                          height={25}
                           className="rounded-xl"
                         />
                         {datum.problemName}
@@ -149,13 +151,6 @@ function ProblemsViewPage() {
                     />
                   </TableCell>
 
-                  {/* <TableCell className="flex items-center justify-center">
-                    {datum.timesSolved}
-                  </TableCell> */}
-
-                  {/* <TableCell>
-                    {new Date(datum.nextReviewDate).toLocaleDateString()}
-                  </TableCell> */}
                   <TableCell className="">
                     <div className="flex items-center gap-3 ">
                       <button
@@ -170,6 +165,7 @@ function ProblemsViewPage() {
                           alt="Details"
                         />
                       </button>
+
                       <Dialog>
                         <DialogTrigger asChild>
                           <button
@@ -196,7 +192,6 @@ function ProblemsViewPage() {
                             </DialogDescription>
                           </DialogHeader>
 
-                          {/*  FORM SECTION */}
                           <form
                             className="grid gap-4 py-4"
                             onSubmit={async (e) => {
@@ -220,7 +215,7 @@ function ProblemsViewPage() {
 
                               if (res.ok) {
                                 console.log("Updated");
-                                location.reload(); // Reload table
+                                location.reload();
                               }
                             }}
                           >
@@ -299,7 +294,6 @@ function ProblemsViewPage() {
                               />
                             </div>
 
-                            {/*  ACTION BUTTONS */}
                             <DialogFooter className="flex justify-end gap-3 pt-4">
                               <DialogClose asChild>
                                 <button
@@ -321,7 +315,12 @@ function ProblemsViewPage() {
                         </DialogContent>
                       </Dialog>
 
-                      <button type="button" title="Review" className="shrink-0">
+                      <button
+                        type="button"
+                        title="Review"
+                        className="shrink-0"
+                        onClick={() => handleReviewed(datum._id)}
+                      >
                         <Image
                           src={CheckBox}
                           width={20}
@@ -329,6 +328,7 @@ function ProblemsViewPage() {
                           alt="Review"
                         />
                       </button>
+
                       <Dialog>
                         <DialogTrigger asChild>
                           <button
@@ -375,7 +375,6 @@ function ProblemsViewPage() {
           </TableBody>
         </Table>
 
-        {/* Pagination Controls */}
         <div className="flex items-center justify-center gap-4 mt-6">
           <Button
             onClick={() => setCurrentPage((prev) => prev - 1)}

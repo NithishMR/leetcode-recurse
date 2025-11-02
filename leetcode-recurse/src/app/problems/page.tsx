@@ -53,7 +53,10 @@ const ProblemAdditionPage = () => {
       difficulty,
       source, // normalize case
       notes,
-      dateSolved: dateSolved ? dateSolved.toISOString() : undefined,
+      dateSolved: dateSolved ? dateSolved.toISOString() : undefined, // add the nextreviewdate here instead of Problem.ts
+      nextReviewDate: dateSolved
+        ? new Date(dateSolved.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString()
+        : undefined,
     };
 
     try {
