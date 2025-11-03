@@ -41,7 +41,7 @@ export function PlatformDropdown({ value, onChange }: DifficultyDropdownProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
-          {value ? value : "Select Your Difficulty"}
+          {value ? value : "Select Your Platform"}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">

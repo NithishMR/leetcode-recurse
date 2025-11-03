@@ -17,18 +17,15 @@ export async function POST(req: Request, context: { params: { id: string } }) {
 
     problem.timesSolved = (problem.timesSolved || 0) + 1;
 
-    // const daysToAdd = getSpacing(problem.timesSolved);
-    const daysToAdd = 7;
+    const daysToAdd = getSpacing(problem.timesSolved);
+    // const daysToAdd = 7;
     const newDate = new Date();
     newDate.setDate(newDate.getDate() + daysToAdd);
 
     problem.nextReviewDate = newDate;
     await problem.save();
     console.log(problem);
-    return NextResponse.json(
-      { message: "Updated successfully", problem },
-      { status: 200 }
-    );
+    return NextResponse.json(problem, { status: 200 });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: "Failed to update" }, { status: 500 });

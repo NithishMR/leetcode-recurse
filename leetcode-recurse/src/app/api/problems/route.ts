@@ -66,12 +66,12 @@ export async function GET(request: Request) {
     );
   }
 }
-
 export async function DELETE(request: Request) {
   try {
     await connectDB();
 
     const { _id } = await request.json();
+
     if (!_id) {
       return NextResponse.json(
         { error: "Problem ID is required" },
@@ -86,7 +86,7 @@ export async function DELETE(request: Request) {
     }
 
     return NextResponse.json(
-      { message: "Problem deleted successfully" },
+      { message: "Problem deleted", deleted },
       { status: 200 }
     );
   } catch (error) {

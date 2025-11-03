@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
   Table,
   TableCaption,
@@ -9,27 +10,15 @@ import {
   TableRow,
   TableBody,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import Image from "next/image";
+
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import ProblemStatus from "./ProblemStatus";
 import ProblemDifficultyStatus from "./ProblemDifficultyStatus";
-import Details from "../../../public/Details.svg";
-import Edit from "../../../public/Edit.svg";
-import Delete from "../../../public/Delete.svg";
-import CheckBox from "../../../public/checkbox.svg";
+
+import { useRouter } from "next/navigation";
+import UserActions from "./UserActions";
+
 type ProblemDataStructure = {
   _id: string;
   problemName: string;
@@ -42,52 +31,92 @@ type ProblemDataStructure = {
   nextReviewDate: string;
 };
 function ProblemsViewPage() {
+  const router = useRouter();
   const [totalPages, setTotalPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [data, setData] = useState<ProblemDataStructure[]>([]);
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     const fetchPage = async () => {
-      const res = await fetch(`/api/problems?page=${currentPage}&limit=10`);
-      const result = await res.json();
-      setData(result.problems);
-      setTotalPages(result.totalPages);
+      try {
+        const res = await fetch(`/api/problems?page=${currentPage}&limit=10`);
+        const result = await res.json();
+        setData(result.problems);
+        setTotalPages(result.totalPages);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setTimeout(() => setLoading(false), 500);
+      }
     };
 
     fetchPage();
   }, [currentPage]);
   const handleReviewed = async (id: string) => {
-    const res = await fetch(`/api/problems/review/${id}`, {
-      method: "POST",
-    });
+    await toast.promise(
+      async () => {
+        const res = await fetch(`/api/problems/review/${id}`, {
+          method: "POST",
+        });
 
-    if (res.ok) {
-      //processDataRetrieval(); // refresh data after update
-      // retrieve the data
-      console.log("changed successfully");
-    }
+        if (!res.ok) throw new Error("Failed to review");
+
+        const saved = await res.json();
+        console.log("Problem reviewed:", saved);
+
+        router.refresh(); //  correct
+        return saved;
+      },
+      {
+        loading: "Reviewing problem...",
+        success: "Successfully reviewed the problem!",
+        error: " Could not review problem",
+      }
+    );
   };
 
-  const getReviewStatus = (nextDate: string, noOfTimesSolved: number) => {
-    const today = new Date();
-    const next = new Date(nextDate);
-    if (noOfTimesSolved >= 7) return "Retired ";
-    if (next > today) return "Active ";
-    if (next.toDateString() === today.toDateString()) return "Due Today";
-    return "Missed ";
-  };
   const handleProblemDelete = async (_id: string) => {
-    const res = await fetch(`/api/problems/`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ _id: _id }),
-    });
-    if (res.ok) {
-      console.log("changed successfully");
-      location.reload();
-    }
+    await toast.promise(
+      async () => {
+        const res = await fetch(`/api/problems`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ _id }),
+        });
+
+        if (!res.ok) throw new Error("Failed to delete");
+
+        const result = await res.json();
+        console.log("Problem deleted:", result);
+
+        router.refresh(); // refresh UI
+        return result;
+      },
+      {
+        loading: "Deleting problem...",
+        success: "Problem deleted successfully!",
+        error: "Failed to delete problem",
+      }
+    );
   };
 
+  const handleViewProblem = (id: string) => {
+    router.push(`/view-problems/${id}`);
+  };
+  // const getReviewStatus = (nextDate: string, noOfTimesSolved: number) => {
+  //   const today = new Date();
+  //   const next = new Date(nextDate);
+  //   if (noOfTimesSolved >= 7) return "Retired ";
+  //   if (next > today) return "Active ";
+  //   if (next.toDateString() === today.toDateString()) return "Due Today";
+  //   return "Missed ";
+  // };
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-50">
+        <p className="text-xl font-medium text-gray-700">Loading problem ...</p>
+      </div>
+    );
   return (
     <div className="flex justify-center py-6">
       <div className="w-full max-w-6xl bg-white p-6 rounded-xl shadow-sm">
@@ -157,217 +186,12 @@ function ProblemsViewPage() {
                     {new Date(datum.nextReviewDate).toLocaleDateString()}
                   </TableCell> */}
                   <TableCell className="">
-                    <div className="flex items-center gap-3 ">
-                      <button
-                        type="button"
-                        title="Details"
-                        className="shrink-0 cursor-pointer"
-                      >
-                        <Image
-                          src={Details}
-                          width={20}
-                          height={20}
-                          alt="Details"
-                        />
-                      </button>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <button
-                            type="button"
-                            title="Edit"
-                            className="shrink-0 p-2 rounded-lg hover:bg-gray-100 transition cursor-pointer"
-                          >
-                            <Image
-                              src={Edit}
-                              width={18}
-                              height={18}
-                              alt="Edit"
-                            />
-                          </button>
-                        </DialogTrigger>
-
-                        <DialogContent className="sm:max-w-[500px]">
-                          <DialogHeader>
-                            <DialogTitle className="text-xl font-semibold">
-                              Edit Problem
-                            </DialogTitle>
-                            <DialogDescription className="text-gray-600">
-                              Update details and click save.
-                            </DialogDescription>
-                          </DialogHeader>
-
-                          {/*  FORM SECTION */}
-                          <form
-                            className="grid gap-4 py-4"
-                            onSubmit={async (e) => {
-                              e.preventDefault();
-
-                              const formData = new FormData(e.currentTarget);
-                              const updatedProblem = {
-                                id: datum._id,
-                                problemName: formData.get("problemName"),
-                                problemUrl: formData.get("problemUrl"),
-                                difficulty: formData.get("difficulty"),
-                                source: formData.get("source"),
-                                notes: formData.get("notes"),
-                              };
-
-                              const res = await fetch("/api/problems/update", {
-                                method: "PUT",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify(updatedProblem),
-                              });
-
-                              if (res.ok) {
-                                console.log("Updated");
-                                location.reload(); // Reload table
-                              }
-                            }}
-                          >
-                            <div className="grid gap-2">
-                              <Label
-                                htmlFor="problemName"
-                                className="text-sm font-medium"
-                              >
-                                Problem Name
-                              </Label>
-                              <Input
-                                id="problemName"
-                                name="problemName"
-                                defaultValue={datum.problemName}
-                                className="focus:ring-2 focus:ring-blue-500"
-                              />
-                            </div>
-
-                            <div className="grid gap-2">
-                              <Label
-                                htmlFor="problemUrl"
-                                className="text-sm font-medium"
-                              >
-                                URL
-                              </Label>
-                              <Input
-                                id="problemUrl"
-                                name="problemUrl"
-                                defaultValue={datum.problemUrl}
-                                className="focus:ring-2 focus:ring-blue-500"
-                              />
-                            </div>
-
-                            <div className="grid gap-2">
-                              <Label
-                                htmlFor="difficulty"
-                                className="text-sm font-medium"
-                              >
-                                Difficulty
-                              </Label>
-                              <Input
-                                id="difficulty"
-                                name="difficulty"
-                                defaultValue={datum.difficulty}
-                                className="capitalize focus:ring-2 focus:ring-blue-500"
-                              />
-                            </div>
-
-                            <div className="grid gap-2">
-                              <Label
-                                htmlFor="source"
-                                className="text-sm font-medium"
-                              >
-                                Source
-                              </Label>
-                              <Input
-                                id="source"
-                                name="source"
-                                defaultValue={datum.source}
-                                className="capitalize focus:ring-2 focus:ring-blue-500"
-                              />
-                            </div>
-
-                            <div className="grid gap-2">
-                              <Label
-                                htmlFor="notes"
-                                className="text-sm font-medium"
-                              >
-                                Notes
-                              </Label>
-                              <Input
-                                id="notes"
-                                name="notes"
-                                defaultValue={datum.notes}
-                                className="focus:ring-2 focus:ring-blue-500"
-                              />
-                            </div>
-
-                            {/*  ACTION BUTTONS */}
-                            <DialogFooter className="flex justify-end gap-3 pt-4">
-                              <DialogClose asChild>
-                                <button
-                                  type="button"
-                                  className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition"
-                                >
-                                  Cancel
-                                </button>
-                              </DialogClose>
-
-                              <button
-                                type="submit"
-                                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition"
-                              >
-                                Save changes
-                              </button>
-                            </DialogFooter>
-                          </form>
-                        </DialogContent>
-                      </Dialog>
-
-                      <button type="button" title="Review" className="shrink-0">
-                        <Image
-                          src={CheckBox}
-                          width={20}
-                          height={20}
-                          alt="Review"
-                        />
-                      </button>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <button
-                            type="button"
-                            title="Delete"
-                            className="shrink-0"
-                          >
-                            <Image
-                              src={Delete}
-                              width={20}
-                              height={20}
-                              alt="Delete"
-                            />
-                          </button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-md">
-                          <DialogTitle className="text-xl font-semibold">
-                            Do you want to delete this problem?
-                          </DialogTitle>
-                          <DialogFooter className="flex justify-end gap-3 pt-4">
-                            <DialogClose asChild>
-                              <button
-                                type="button"
-                                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition"
-                              >
-                                Cancel
-                              </button>
-                            </DialogClose>
-
-                            <button
-                              onClick={() => handleProblemDelete(datum._id)}
-                              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition"
-                            >
-                              Delete
-                            </button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
+                    <UserActions
+                      data={datum}
+                      onView={handleViewProblem}
+                      onReview={handleReviewed}
+                      onDelete={handleProblemDelete}
+                    />
                   </TableCell>
                 </TableRow>
               ))

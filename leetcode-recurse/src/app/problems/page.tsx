@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { CalendarPicker } from "./DateSolved";
 import { Button } from "@/components/ui/button";
 import { PlatformDropdown } from "./PlatformDropdown";
-
+import { toast } from "sonner";
 interface Problem {
   _id?: string;
   problemName: string;
@@ -51,35 +51,45 @@ const ProblemAdditionPage = () => {
       problemName,
       problemUrl,
       difficulty,
-      source, // normalize case
+      source,
       notes,
-      dateSolved: dateSolved ? dateSolved.toISOString() : undefined, // add the nextreviewdate here instead of Problem.ts
+      dateSolved: dateSolved ? dateSolved.toISOString() : undefined,
       nextReviewDate: dateSolved
         ? new Date(dateSolved.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString()
         : undefined,
     };
 
-    try {
-      const res = await fetch("/api/problems", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newProblem),
-      });
+    await toast.promise(
+      async () => {
+        const res = await fetch("/api/problems", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newProblem),
+        });
 
-      const saved = await res.json();
-      console.log("Problem saved:", saved);
+        if (!res.ok) throw new Error("Failed to save");
 
-      // Reset form fields
-      setProblemName("");
-      setProblemUrl("");
-      setDifficulty("Easy");
-      setSource("");
-      setNotes("");
-      setDateSolved(undefined);
-    } catch (error) {
-      console.error("Error saving problem:", error);
-    }
+        const saved = await res.json();
+        console.log("Problem saved:", saved);
+
+        // Reset fields
+        setProblemName("");
+        setProblemUrl("");
+        setDifficulty("Easy");
+        setSource("");
+        setNotes("");
+        setDateSolved(undefined);
+
+        return saved;
+      },
+      {
+        loading: "Adding problem...",
+        success: `${problemName} added successfully `,
+        error: "Could not add problem ",
+      }
+    );
   };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-start p-6 space-y-8">
       <div className="w-full max-w-4xl bg-white shadow-xl rounded-2xl p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -132,19 +142,6 @@ const ProblemAdditionPage = () => {
           <DifficultyDropdown value={difficulty} onChange={setDifficulty} />
         </div>
 
-        {/* Platform / Source */}
-        {/* <div className="flex flex-col">
-          <Label htmlFor="source" className="mb-1 text-gray-700 font-medium">
-            Platform Name
-          </Label>
-          <Input
-            id="source"
-            type="text"
-            placeholder="Example: LeetCode"
-            value={source}
-            onChange={(e) => setSource(e.target.value)}
-          />
-        </div> */}
         <div className="flex flex-col">
           <Label htmlFor="source" className="mb-1 text-gray-700 font-medium">
             Platform Name
