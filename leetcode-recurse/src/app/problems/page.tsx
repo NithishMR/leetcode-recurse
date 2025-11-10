@@ -127,7 +127,6 @@ const ProblemAdditionPage = () => {
             type="text"
             placeholder="Example: Two Sum"
             value={problemName}
-            required={true}
             onChange={(e) => setProblemName(e.target.value)}
           />
         </div>
@@ -145,7 +144,6 @@ const ProblemAdditionPage = () => {
             type="url"
             placeholder="https://url"
             value={problemUrl}
-            required={true}
             onChange={(e) => setProblemUrl(e.target.value)}
           />
         </div>

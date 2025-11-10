@@ -7,10 +7,10 @@ import UpcomingReviews from "./UpcomingReviews";
 import DifficyltyDistribution from "./DifficultyDistribution";
 
 export default function DashBoard() {
-  const [problemCount, setProblemCount] = useState<number>(0);
-  const [reviewedToday, setReviewedToday] = useState(0);
-  const [pendingToday, setPendingToday] = useState(0);
-  const [overdue, setOverdue] = useState(0);
+  const [problemCount, setProblemCount] = useState<number>(-1);
+  const [reviewedToday, setReviewedToday] = useState(-1);
+  const [pendingToday, setPendingToday] = useState(-1);
+  const [overdue, setOverdue] = useState(-1);
 
   const handleProblemCount = async () => {
     const response = await fetch("/api/dashboard/problem-count");
