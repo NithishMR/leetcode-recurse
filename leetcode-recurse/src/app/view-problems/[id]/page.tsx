@@ -1,17 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
-// Updated color scheme for a vibrant, distinct, and high-contrast look
+// Consistent date formatter (SSR + client safe)
+const formatDate = (dateStr: string) => {
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  }).format(new Date(dateStr));
+};
+
 const difficultyColors: any = {
   easy: "bg-green-50 text-green-700 border-green-300",
   medium: "bg-yellow-50 text-yellow-700 border-yellow-300",
   hard: "bg-red-50 text-red-700 border-red-300",
 };
 
-// --- Custom SVG Icons (Pure HTML/Tailwind) ---
-
+// Icons (unchanged)
 const CalendarIcon = (props: any) => (
   <svg
     {...props}
@@ -53,97 +61,83 @@ const AcademicCapIcon = (props: any) => (
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
-    strokeWidth={2}
+    strokeWidth={1.8}
     stroke="currentColor"
   >
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
-      d="M4.26 10.147l6-3.899 6 3.899M6 18h12M9 20V8.188a3.1 3.1 0 0 1 3-3.088c1.674 0 3 1.408 3 3.088V20M6 18v2M18 18v2M12 16v-2.188a3 3 0 0 1 3-3c1.674 0 3 1.408 3 3.088V16"
-    />
-  </svg>
-);
-
-const BookOpenIcon = (props: any) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={2}
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M12 6.75A.75.75 0 0 1 12.75 7.5v2.25H15a.75.75 0 0 1 0 1.5h-2.25v2.25a.75.75 0 0 1-1.5 0v-2.25H9a.75.75 0 0 1 0-1.5h2.25V7.5A.75.75 0 0 1 12 6.75ZM9 17.25h6"
+      d="M12 3L2 8l10 5 10-5-10-5z"
     />
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
-      d="M9 4.5a1.5 1.5 0 0 0-1.5 1.5V18a.75.75 0 0 0 1.5 0v-11.25H15a.75.75 0 0 0 .75-.75V6a1.5 1.5 0 0 0-1.5-1.5H9Z"
+      d="M6 10v5.5A6.5 6.5 0 0012 22a6.5 6.5 0 006-6.5V10"
     />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 13l8-4" />
   </svg>
 );
-
-// ---------------------------------------------
 
 export default function ProblemDetails() {
+  const router = useRouter();
   const { id } = useParams();
+
   const [problem, setProblem] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  const handleReviewed = async () => {
+    try {
+      const res = await fetch(`/api/problems/review/${id}`, { method: "POST" });
+      if (!res.ok) throw new Error("Review failed");
+
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
-    const fetchProblem = async () => {
+    async function fetchData() {
       try {
         const res = await fetch(`/api/problems/details/${id}`);
-        if (!res.ok) throw new Error("Problem fetch failed");
         const data = await res.json();
         setProblem(data);
-      } catch (error) {
-        console.error("Error fetching problem:", error);
-        setProblem(null);
+      } catch (err) {
+        console.log(err);
       } finally {
-        setTimeout(() => setLoading(false), 500);
+        setLoading(false); //  no artificial delay
       }
-    };
-
-    fetchProblem();
+    }
+    fetchData();
   }, [id]);
 
-  // Loading/Error states
   if (loading)
     return (
       <div className="flex justify-center items-center h-screen bg-gray-50">
-        <p className="text-xl font-medium text-gray-700">
-          Loading problem details...
-        </p>
+        <p className="text-xl text-gray-700">Loading…</p>
       </div>
     );
+
   if (!problem)
     return (
       <div className="flex justify-center items-center h-screen bg-gray-50">
-        <p className="text-xl font-medium text-red-500">
-          Problem not found or an error occurred.
-        </p>
+        <p className="text-xl text-red-500">Problem not found.</p>
       </div>
     );
 
   return (
-    // General container for a clean look
     <div className="min-h-screen bg-gray-50 py-10">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* ## Problem Header Card 🏆 */}
-        <div className="bg-white shadow-lg p-8 rounded-2xl mb-8 border border-gray-100">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            {/* Title and Source */}
+      <div className="max-w-5xl mx-auto px-4">
+        <div className="bg-white shadow-lg p-8 rounded-2xl mb-8 border">
+          <div className="flex flex-col sm:flex-row justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-extrabold text-gray-900 leading-tight">
+              <h1 className="text-4xl font-extrabold text-gray-900">
                 {problem.problemName}
               </h1>
+
               <p className="mt-2 text-lg text-gray-500 flex items-center">
                 <img
-                  src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${problem.source}.com&size=24`}
+                  src={`https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${problem.source}.com&size=64`}
                   alt="source icon"
                 />
                 <span className="font-semibold ml-1 text-gray-700">
@@ -151,119 +145,64 @@ export default function ProblemDetails() {
                 </span>
               </p>
             </div>
-
-            {/* Difficulty Badge */}
-            <span
-              className={`px-4 py-1.5 border-2 rounded-full text-base font-bold uppercase tracking-wider min-w-[120px] text-center ${
-                difficultyColors[problem.difficulty] ||
-                "bg-gray-100 text-gray-700 border-gray-300"
-              }`}
-            >
-              {problem.difficulty}
-            </span>
           </div>
-
-          {/* Open Problem Button */}
-          <button
-            onClick={() =>
-              window.open(problem.problemUrl, "_blank", "noopener,noreferrer")
-            }
-            className="
-    mt-6 inline-flex items-center gap-2
-    bg-gray-900 hover:bg-black
-    text-white font-semibold
-    px-5 py-3
-    rounded-xl
-    transition-all duration-200
-    shadow-sm hover:shadow
-    focus:outline-none focus:ring-4 focus:ring-gray-300
-  "
+          <Button
+            className="bg-gray-900 hover:bg-black text-white mt-6 px-5 py-3 rounded-xl"
+            onClick={() => {
+              handleReviewed();
+              window.location.href = problem.problemUrl;
+            }}
           >
-            <span>Open Problem</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-5 h-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="2"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M13 7l5 5m0 0l-5 5m5-5H6"
-              />
-            </svg>
-          </button>
+            Solve the Problem
+          </Button>
         </div>
 
-        {/* --- */}
-
-        {/* ## Review Stats Grid 📊 */}
+        {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-          {/* Solved On Card */}
-          <div className="bg-white p-6 shadow-md rounded-xl border border-gray-100 hover:shadow-lg transition duration-300">
-            <div className="flex items-center justify-center mb-3 text-blue-600">
-              <CalendarIcon className="w-6 h-6 mr-2" />
-              <p className="text-sm text-gray-500 uppercase tracking-wider font-medium">
-                Solved On
-              </p>
-            </div>
-            <p className="text-2xl font-bold text-gray-900 text-center">
-              {new Date(problem.dateSolved).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })}
-            </p>
-          </div>
+          <StatCard
+            icon={<CalendarIcon className="w-6 h-6 mr-2" />}
+            label="Solved On"
+            value={formatDate(problem.dateSolved)}
+            color="text-blue-600"
+          />
 
-          {/* Next Review Card */}
-          <div className="bg-white p-6 shadow-md rounded-xl border border-gray-100 hover:shadow-lg transition duration-300">
-            <div className="flex items-center justify-center mb-3 text-orange-600">
-              <ClockIcon className="w-6 h-6 mr-2" />
-              <p className="text-sm text-gray-500 uppercase tracking-wider font-medium">
-                Next Review
-              </p>
-            </div>
-            <p className="text-2xl font-bold text-gray-900 text-center">
-              {new Date(problem.nextReviewDate).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })}
-            </p>
-          </div>
+          <StatCard
+            icon={<ClockIcon className="w-6 h-6 mr-2" />}
+            label="Next Review"
+            value={formatDate(problem.nextReviewDate)}
+            color="text-orange-600"
+          />
 
-          {/* Times Reviewed Card */}
-          <div className="bg-white p-6 shadow-md rounded-xl border border-gray-100 hover:shadow-lg transition duration-300">
-            <div className="flex items-center justify-center mb-3 text-purple-600">
-              <AcademicCapIcon className="w-6 h-6 mr-2" />
-              <p className="text-sm text-gray-500 uppercase tracking-wider font-medium">
-                Times Reviewed
-              </p>
-            </div>
-            <p className="text-2xl font-bold text-gray-900 text-center">
-              {problem.timesSolved || 0}
-            </p>
-          </div>
+          <StatCard
+            icon={<AcademicCapIcon className="w-6 h-6 mr-2" />}
+            label="Times Reviewed"
+            value={problem.timesSolved}
+            color="text-purple-600"
+          />
         </div>
 
-        {/* --- */}
-
-        {/* ## Notes Section 📝 */}
-        <div className="bg-white p-8 shadow-lg rounded-2xl border border-gray-100">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4 border-b pb-2">
+        {/* Notes */}
+        <div className="bg-white p-8 shadow-lg rounded-2xl border">
+          <h2 className="text-2xl font-bold mb-4 border-b pb-2">
             Notes & Observations
           </h2>
-          <div className="max-w-none text-lg text-gray-700">
-            <p className="leading-relaxed whitespace-pre-line">
-              {problem.notes ||
-                "No detailed notes or observations have been added for this problem yet."}
-            </p>
-          </div>
+          <p className="text-lg text-gray-700 whitespace-pre-line">
+            {problem.notes || "No notes added for this problem yet."}
+          </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+function StatCard({ icon, label, value, color }: any) {
+  return (
+    <div className="bg-white p-6 shadow-md rounded-xl border hover:shadow-lg transition">
+      <div className={`flex items-center justify-center mb-3 ${color}`}>
+        {icon}
+        <p className="text-sm uppercase tracking-wider">{label}</p>
+      </div>
+      <p className="text-2xl font-bold text-center">{value}</p>
     </div>
   );
 }

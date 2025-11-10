@@ -100,9 +100,9 @@ function ProblemsViewPage() {
     );
   };
 
-  const handleViewProblem = (id: string) => {
-    router.push(`/view-problems/${id}`);
-  };
+  // const handleViewProblem = (id: string) => {
+  //   router.push(`/view-problems/${id}`);
+  // };
   // const getReviewStatus = (nextDate: string, noOfTimesSolved: number) => {
   //   const today = new Date();
   //   const next = new Date(nextDate);
@@ -132,7 +132,7 @@ function ProblemsViewPage() {
               <TableHead>Problem</TableHead>
               <TableHead>Difficulty</TableHead>
               <TableHead>Date Solved</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead className="text-center">Status</TableHead>
               {/* <TableHead>Times Reviewed</TableHead> */}
               <TableHead>ACTIONS</TableHead>
             </TableRow>
@@ -149,7 +149,7 @@ function ProblemsViewPage() {
               data.map((datum, index) => (
                 <TableRow key={index} className="hover:bg-gray-50">
                   <TableCell className="font-medium">
-                    <Link href={datum.problemUrl} target="_blank">
+                    <Link href={`view-problems/${datum._id}`}>
                       <div className="flex items-center gap-4">
                         <img
                           src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${datum.source}.com&size=64`}
@@ -186,12 +186,7 @@ function ProblemsViewPage() {
                     {new Date(datum.nextReviewDate).toLocaleDateString()}
                   </TableCell> */}
                   <TableCell className="">
-                    <UserActions
-                      data={datum}
-                      onView={handleViewProblem}
-                      onReview={handleReviewed}
-                      onDelete={handleProblemDelete}
-                    />
+                    <UserActions data={datum} onDelete={handleProblemDelete} />
                   </TableCell>
                 </TableRow>
               ))

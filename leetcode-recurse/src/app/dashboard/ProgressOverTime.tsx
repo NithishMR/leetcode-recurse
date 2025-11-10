@@ -1,7 +1,9 @@
+import CustomBarChart from "./CustomBarchart";
+
 export default function ProgressOverTime() {
   return (
     <div className="">
-      <div className="text-center text-3xl">Progress Over Time</div>
+      <CustomBarChart />
     </div>
   );
 }

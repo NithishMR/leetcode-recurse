@@ -1,7 +1,7 @@
 import { connectDB } from "@/database/connection";
 import Problem from "@/database/Problem";
 import { NextResponse } from "next/server";
-
+import ActivityLog from "@/database/ActivityLog";
 export async function POST(request: Request) {
   try {
     await connectDB();
@@ -26,7 +26,11 @@ export async function POST(request: Request) {
       dateSolved,
       nextReviewDate,
     });
-
+    await ActivityLog.create({
+      type: "add",
+      problemId: problem._id,
+      problemName: problem.problemName,
+    });
     return NextResponse.json(problem, { status: 201 });
   } catch (error) {
     console.error("Error creating problem:", error);
@@ -80,6 +84,11 @@ export async function DELETE(request: Request) {
     }
 
     const deleted = await Problem.findByIdAndDelete(_id);
+    await ActivityLog.create({
+      type: "delete",
+      problemId: deleted._id,
+      problemName: deleted.problemName,
+    });
 
     if (!deleted) {
       return NextResponse.json({ error: "Problem not found" }, { status: 404 });

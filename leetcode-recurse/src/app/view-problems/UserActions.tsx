@@ -21,28 +21,23 @@ import CheckBox from "../../../public/checkbox.svg";
 
 interface UserActionsProps {
   data: any; // single problem row (datum)
-  onView: (id: string) => void;
-  onReview: (id: string) => void;
+  // onView?: (id: string) => void;
+  // onReview?: (id: string) => void;
   onDelete: (id: string) => void;
 }
 
-export default function UserActions({
-  data,
-  onView,
-  onReview,
-  onDelete,
-}: UserActionsProps) {
+export default function UserActions({ data, onDelete }: UserActionsProps) {
   return (
     <div className="flex items-center gap-3">
       {/* ----------- VIEW DETAILS ------------- */}
-      <button
+      {/* <button
         type="button"
         title="Details"
         className="shrink-0 cursor-pointer"
         onClick={() => onView(data._id)}
       >
         <Image src={Details} width={20} height={20} alt="Details" />
-      </button>
+      </button> */}
 
       {/* ----------- EDIT DETAILS ------------- */}
       <Dialog>
@@ -152,7 +147,7 @@ export default function UserActions({
       </Dialog>
 
       {/* ----------- MARK REVIEWED ------------- */}
-      <Dialog>
+      {/* <Dialog>
         <DialogTrigger asChild>
           <button type="button" title="Review" className="shrink-0">
             <Image src={CheckBox} width={20} height={20} alt="Review" />
@@ -183,7 +178,7 @@ export default function UserActions({
             </DialogClose>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
 
       {/* ----------- DELETE PROBLEM ------------- */}
       <Dialog>

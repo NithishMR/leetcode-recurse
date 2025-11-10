@@ -1,7 +1,7 @@
+import ActivityLog from "@/database/ActivityLog";
 import { connectDB } from "@/database/connection";
 import Problem from "@/database/Problem";
 import { NextResponse } from "next/server";
-
 //  Update a particular problem
 export async function PUT(request: Request) {
   try {
@@ -10,7 +10,7 @@ export async function PUT(request: Request) {
     const body = await request.json();
     const { id, problemName, problemUrl, difficulty, source, notes } = body;
 
-    // ✅ Check if ID exists
+    // Check if ID exists
     if (!id) {
       return NextResponse.json(
         { error: "Problem ID is required" },
@@ -35,6 +35,11 @@ export async function PUT(request: Request) {
     if (!updatedProblem) {
       return NextResponse.json({ error: "Problem not found" }, { status: 404 });
     }
+    await ActivityLog.create({
+      type: "edit",
+      problemId: updatedProblem._id,
+      problemName: updatedProblem.problemName,
+    });
 
     return NextResponse.json(updatedProblem, { status: 200 });
   } catch (error) {

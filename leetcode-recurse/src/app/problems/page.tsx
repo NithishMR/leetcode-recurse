@@ -47,6 +47,23 @@ const ProblemAdditionPage = () => {
 
   // Handle form submission
   const handleAddProblem = async () => {
+    if (!problemName.trim()) {
+      toast.error("Problem name is required");
+      return;
+    }
+    if (!problemUrl.trim()) {
+      toast.error("Problem URL is required");
+      return;
+    }
+    if (!source.trim()) {
+      toast.error("Platform name is required");
+      return;
+    }
+    if (!dateSolved) {
+      toast.error("Select a solved date");
+      return;
+    }
+
     const newProblem = {
       problemName,
       problemUrl,
@@ -110,6 +127,7 @@ const ProblemAdditionPage = () => {
             type="text"
             placeholder="Example: Two Sum"
             value={problemName}
+            required={true}
             onChange={(e) => setProblemName(e.target.value)}
           />
         </div>
@@ -127,6 +145,7 @@ const ProblemAdditionPage = () => {
             type="url"
             placeholder="https://url"
             value={problemUrl}
+            required={true}
             onChange={(e) => setProblemUrl(e.target.value)}
           />
         </div>
