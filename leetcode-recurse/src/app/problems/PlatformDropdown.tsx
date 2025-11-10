@@ -34,6 +34,11 @@ const PLATFORMS = [
     key: "coderchef",
     icon: "https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://coderchef.com&size=64",
   },
+  {
+    name: "GeeksForGeeks",
+    key: "geeksforgeeks",
+    icon: "https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://geeksforgeeks.org&size=64",
+  },
 ];
 
 export function PlatformDropdown({ value, onChange }: DifficultyDropdownProps) {

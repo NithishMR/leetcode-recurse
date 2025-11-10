@@ -147,7 +147,8 @@ export default function ProblemDetails() {
             </div>
           </div>
           <Button
-            className="bg-gray-900 hover:bg-black text-white mt-6 px-5 py-3 rounded-xl"
+            variant={"outline"}
+            className=""
             onClick={() => {
               handleReviewed();
               window.location.href = problem.problemUrl;
