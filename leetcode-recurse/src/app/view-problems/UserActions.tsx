@@ -68,7 +68,7 @@ export default function UserActions({ data, onDelete }: UserActionsProps) {
               const formData = new FormData(e.currentTarget);
 
               const updatedProblem = {
-                id: data._id,
+                _id: data._id,
                 problemName: formData.get("problemName"),
                 problemUrl: formData.get("problemUrl"),
                 difficulty: formData.get("difficulty"),

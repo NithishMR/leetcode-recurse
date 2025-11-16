@@ -1,41 +1,58 @@
 import ActivityLog from "@/database/ActivityLog";
 import { connectDB } from "@/database/connection";
 import Problem from "@/database/Problem";
-import { NextResponse } from "next/server";
-//  Update a particular problem
-export async function PUT(request: Request) {
+import { getToken } from "next-auth/jwt";
+import { NextResponse, NextRequest } from "next/server";
+
+export async function PUT(req: NextRequest) {
   try {
+    // Auth check
+    const token: any = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    if (!token || !token.user || !token.user.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await connectDB();
+    const userId = token.user.id;
 
-    const body = await request.json();
-    const { id, problemName, problemUrl, difficulty, source, notes } = body;
+    const body = await req.json();
+    const { _id, problemName, problemUrl, difficulty, source, notes } = body;
 
-    // Check if ID exists
-    if (!id) {
+    if (!_id) {
       return NextResponse.json(
         { error: "Problem ID is required" },
         { status: 400 }
       );
     }
 
-    // Find and update problem
-    const updatedProblem = await Problem.findByIdAndUpdate(
-      id,
-      {
-        problemName,
-        problemUrl,
-        difficulty,
-        source,
-        notes,
-      },
-      { new: true } // return updated document
+    // Build update object ONLY with fields that exist
+    const updateData: any = {};
+    if (clean(problemName) !== undefined)
+      updateData.problemName = clean(problemName);
+    if (clean(problemUrl) !== undefined)
+      updateData.problemUrl = clean(problemUrl);
+    if (clean(difficulty) !== undefined)
+      updateData.difficulty = clean(difficulty);
+    if (clean(source) !== undefined) updateData.source = clean(source);
+    if (clean(notes) !== undefined) updateData.notes = clean(notes);
+
+    // Update only fields that were provided
+    const updatedProblem = await Problem.findOneAndUpdate(
+      { _id, userId },
+      { $set: updateData }, // <-- IMPORTANT FIX
+      { new: true }
     );
 
-    // ✅ If no document found
     if (!updatedProblem) {
       return NextResponse.json({ error: "Problem not found" }, { status: 404 });
     }
+
     await ActivityLog.create({
+      userId,
       type: "edit",
       problemId: updatedProblem._id,
       problemName: updatedProblem.problemName,
@@ -50,3 +67,5 @@ export async function PUT(request: Request) {
     );
   }
 }
+
+const clean = (value: any) => (value === "" ? undefined : value);

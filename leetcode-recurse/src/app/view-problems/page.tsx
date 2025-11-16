@@ -206,7 +206,7 @@ function ProblemsViewPage() {
         <div className="w-full max-w-6xl bg-white p-6 rounded-xl shadow-sm">
           <div className="flex flex-row justify-around items-center relative">
             <h1 className="font-bold text-2xl mb-12">LIST OF YOUR PROBLEMS</h1>
-            <div className="absolute top-0 right-20">
+            <div className="inline top-0 right-20">
               <Popover>
                 <PopoverTrigger>
                   <div className="flex flex-row justify-around items-center">

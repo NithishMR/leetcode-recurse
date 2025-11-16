@@ -1,10 +1,22 @@
 import { connectDB } from "@/database/connection";
 import Problem from "@/database/Problem";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     await connectDB();
+
+    const token: any = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    if (!token?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = token.user.id;
 
     const today = new Date();
     const tomorrow = new Date(today);
@@ -13,13 +25,21 @@ export async function GET() {
     const nextWeek = new Date(today);
     nextWeek.setDate(today.getDate() + 7);
 
+    // Only upcoming reviews for THIS user in the next 7 days
     const reviews = await Problem.find(
-      { nextReviewDate: { $gte: tomorrow, $lte: nextWeek } },
-      { problemName: 1, source: 1, difficulty: 1, nextReviewDate: 1 }
+      {
+        userId,
+        nextReviewDate: { $gte: tomorrow, $lte: nextWeek },
+      },
+      {
+        problemName: 1,
+        source: 1,
+        difficulty: 1,
+        nextReviewDate: 1,
+      }
     )
       .sort({ nextReviewDate: 1 })
-      .limit(10); // when user presses the view all the upcoming reviews in a week
-    // make a seperate route and just remove the limit
+      .limit(10);
 
     return NextResponse.json({ reviews }, { status: 200 });
   } catch (error) {

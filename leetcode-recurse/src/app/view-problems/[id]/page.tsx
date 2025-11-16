@@ -5,12 +5,17 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 // Consistent date formatter (SSR + client safe)
-const formatDate = (dateStr: string) => {
+const formatDate = (dateStr: string | null | undefined) => {
+  if (!dateStr) return "—"; // handle null or undefined
+
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "—"; // handle invalid date
+
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
-  }).format(new Date(dateStr));
+  }).format(date);
 };
 
 const difficultyColors: any = {

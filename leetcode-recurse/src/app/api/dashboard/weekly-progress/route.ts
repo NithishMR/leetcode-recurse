@@ -1,13 +1,30 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/database/connection";
 import Problem from "@/database/Problem";
+import { getToken } from "next-auth/jwt";
+import mongoose from "mongoose";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     await connectDB();
 
-    // 1Aggregate solved counts
+    const token: any = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    if (!token?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = token.user.id;
+    const uid = new mongoose.Types.ObjectId(userId); // <-- FIX
+
+    // -----------------------------
+    // 1️⃣ Aggregate SOLVED per week
+    // -----------------------------
     const solvedData = await Problem.aggregate([
+      { $match: { userId: uid, dateSolved: { $ne: null } } },
       {
         $addFields: {
           week: { $isoWeek: "$dateSolved" },
@@ -22,8 +39,11 @@ export async function GET() {
       },
     ]);
 
-    // 2Aggregate pending counts
+    // -----------------------------
+    // 2️⃣ Aggregate PENDING per week
+    // -----------------------------
     const pendingData = await Problem.aggregate([
+      { $match: { userId: uid, nextReviewDate: { $ne: null } } },
       {
         $addFields: {
           week: { $isoWeek: "$nextReviewDate" },
@@ -38,13 +58,13 @@ export async function GET() {
       },
     ]);
 
-    //  Merge both arrays into one combined structure
+    // -----------------------------
+    // 3️⃣ Merge both results
+    // -----------------------------
     const combinedMap = new Map();
 
     for (const entry of solvedData) {
-      if (entry._id.year == null || entry._id.week == null) {
-        continue;
-      }
+      if (entry._id.year == null || entry._id.week == null) continue;
       const key = `${entry._id.year}-W${entry._id.week}`;
       combinedMap.set(key, {
         weekLabel: key,
@@ -54,6 +74,7 @@ export async function GET() {
     }
 
     for (const entry of pendingData) {
+      if (entry._id.year == null || entry._id.week == null) continue;
       const key = `${entry._id.year}-W${entry._id.week}`;
       if (combinedMap.has(key)) {
         combinedMap.get(key)!.pending = entry.pending;

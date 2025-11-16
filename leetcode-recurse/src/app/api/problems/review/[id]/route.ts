@@ -1,37 +1,72 @@
 import ActivityLog from "@/database/ActivityLog";
 import { connectDB } from "@/database/connection";
 import Problem from "@/database/Problem";
-import { NextResponse } from "next/server";
-export async function POST(req: Request, context: { params: { id: string } }) {
+import { getToken } from "next-auth/jwt";
+import { NextResponse, NextRequest } from "next/server";
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    // 1. AUTH CHECK
+    const token: any = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    if (!token?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const userId = token.user.id;
+
+    // 2. Extract ID from URL params (NOT req.json)
+    const { id } = await params;
+    const _id = id;
+
+    if (!_id) {
+      return NextResponse.json(
+        { error: "Problem ID is required" },
+        { status: 400 }
+      );
+    }
+
     await connectDB();
 
-    const { params } = context;
-    const id = (await params).id;
-    console.log("ID from route:", id);
+    // 3. FIND PROBLEM FOR THIS USER ONLY
+    const problem = await Problem.findOne({ _id, userId });
 
-    const problem = await Problem.findById(id);
+    if (!problem) {
+      return NextResponse.json(
+        { error: "Problem not found or unauthorized" },
+        { status: 404 }
+      );
+    }
+
+    // 4. LOG REVIEW
     await ActivityLog.create({
+      userId,
       type: "review",
       problemId: problem._id,
       problemName: problem.problemName,
     });
 
-    //  2. Increment timesSolved
+    // 5. INCREMENT TIMES SOLVED
     problem.timesSolved = (problem.timesSolved || 0) + 1;
 
-    //  3. Set 'dateSolved' to today (new review date)
+    // 6. UPDATE LAST SOLVED DATE
     const today = new Date();
     problem.dateSolved = today;
 
-    //  4. Set nextReviewDate based on spaced repetition schedule
+    // 7. SPACED REPETITION NEXT REVIEW DATE
     const daysToAdd = getSpacing(problem.timesSolved);
     const nextDate = new Date();
     nextDate.setDate(today.getDate() + daysToAdd);
 
     problem.nextReviewDate = nextDate;
 
-    //  Save the updated problem
+    // 8. SAVE
     await problem.save();
 
     return NextResponse.json(problem, { status: 200 });
@@ -41,7 +76,7 @@ export async function POST(req: Request, context: { params: { id: string } }) {
   }
 }
 
-// Spaced repetition schedule
+// Spaced repetition intervals
 function getSpacing(times: number) {
   const schedule = [7, 14, 30, 60];
   return schedule[Math.min(times - 1, schedule.length - 1)];
