@@ -206,11 +206,11 @@ function ProblemsViewPage() {
         <div className="w-full max-w-6xl bg-white p-6 rounded-xl shadow-sm">
           <div className="flex flex-row justify-around items-center relative">
             <h1 className="font-bold text-2xl mb-12">LIST OF YOUR PROBLEMS</h1>
-            <div className="inline top-0 right-20">
+            <div className="inline top-0 right-20 ">
               <Popover>
                 <PopoverTrigger>
                   <div className="flex flex-row justify-around items-center">
-                    <div className="px-4 py-2 border-2 border-gray-300 rounded-[10px]">
+                    <div className="px-4 py-2 border-2 border-gray-300 rounded-[10px] cursor-pointer">
                       Open Filter
                     </div>
                   </div>
@@ -220,7 +220,7 @@ function ProblemsViewPage() {
                   <div className="sticky top-0 bg-white z-20 border-b py-4 mb-6">
                     <div className="flex flex-col gap-4 w-full max-w-6xl mx-auto px-2">
                       {/* Difficulty */}
-                      <div className="flex items-center justify-around">
+                      <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold text-gray-700">
                           Difficulty:
                         </span>
@@ -238,7 +238,7 @@ function ProblemsViewPage() {
                       </div>
 
                       {/* Source */}
-                      <div className="flex items-center justify-around">
+                      <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold text-gray-700">
                           Source:
                         </span>
@@ -258,7 +258,7 @@ function ProblemsViewPage() {
                       </div>
 
                       {/* Status */}
-                      <div className="flex items-center justify-around">
+                      <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold text-gray-700">
                           Status:
                         </span>
@@ -277,7 +277,7 @@ function ProblemsViewPage() {
                       </div>
 
                       {/* Date */}
-                      <div className="flex items-center justify-around">
+                      <div className="flex items-center justify-between">
                         <span className="text-sm font-semibold text-gray-700">
                           Date:
                         </span>
@@ -295,7 +295,7 @@ function ProblemsViewPage() {
                       </div>
 
                       {/* Buttons */}
-                      <div className="flex justify-end items-center gap-3">
+                      <div className="flex justify-around items-center gap-3">
                         <Button
                           variant={"outline"}
                           onClick={() => {
@@ -306,7 +306,7 @@ function ProblemsViewPage() {
                             setDateFilter("any");
                             router.refresh();
                           }}
-                          className="text-sm text-blue-600"
+                          className="text-sm text-blue-600 cursor-pointer w-28"
                         >
                           Reset
                         </Button>
@@ -314,7 +314,7 @@ function ProblemsViewPage() {
                         <Button
                           variant={"outline"}
                           onClick={handleFilter}
-                          className="text-sm"
+                          className="text-sm cursor-pointer  w-28"
                         >
                           Filter
                         </Button>
@@ -492,7 +492,7 @@ function ProblemsViewPage() {
               onClick={() => setCurrentPage((prev) => prev - 1)}
               disabled={currentPage === 1}
               variant="outline"
-              className="px-4 py-2"
+              className="px-4 py-2 cursor-pointer"
             >
               Previous
             </Button>
@@ -505,7 +505,7 @@ function ProblemsViewPage() {
               onClick={() => setCurrentPage((prev) => prev + 1)}
               disabled={currentPage === totalPages}
               variant="outline"
-              className="px-4 py-2"
+              className="px-4 py-2 cursor-pointer"
             >
               Next
             </Button>

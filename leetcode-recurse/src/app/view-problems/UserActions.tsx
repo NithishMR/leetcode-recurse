@@ -45,7 +45,7 @@ export default function UserActions({ data, onDelete }: UserActionsProps) {
           <button
             type="button"
             title="Edit"
-            className="shrink-0 p-2 rounded-lg hover:bg-gray-100 transition cursor-pointer"
+            className="shrink-0 p-2 rounded-lg hover:bg-gray-100 transition cursor-pointer "
           >
             <Image src={Edit} width={18} height={18} alt="Edit" />
           </button>
@@ -126,7 +126,7 @@ export default function UserActions({ data, onDelete }: UserActionsProps) {
               <DialogClose asChild>
                 <button
                   type="button"
-                  className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition"
+                  className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -135,7 +135,7 @@ export default function UserActions({ data, onDelete }: UserActionsProps) {
                 <DialogClose asChild>
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition"
+                    className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition cursor-pointer"
                   >
                     Save changes
                   </button>
@@ -183,7 +183,11 @@ export default function UserActions({ data, onDelete }: UserActionsProps) {
       {/* ----------- DELETE PROBLEM ------------- */}
       <Dialog>
         <DialogTrigger asChild>
-          <button type="button" title="Delete" className="shrink-0">
+          <button
+            type="button"
+            title="Delete"
+            className="shrink-0 cursor-pointer"
+          >
             <Image src={Delete} width={20} height={20} alt="Delete" />
           </button>
         </DialogTrigger>
@@ -195,14 +199,14 @@ export default function UserActions({ data, onDelete }: UserActionsProps) {
 
           <DialogFooter className="flex justify-end gap-3 pt-4">
             <DialogClose asChild>
-              <button className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition">
+              <button className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition cursor-pointer">
                 Cancel
               </button>
             </DialogClose>
             <DialogClose asChild>
               <button
                 onClick={() => onDelete(data._id)}
-                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition"
+                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition cursor-pointer"
               >
                 Delete
               </button>

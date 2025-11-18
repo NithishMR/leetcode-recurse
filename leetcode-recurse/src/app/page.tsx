@@ -36,12 +36,21 @@ export default function Home() {
                   Signed in as <b>{user.name}</b>
                 </div>
 
-                <Button variant="outline" onClick={() => signOut()}>
+                {/* <Button variant="outline" onClick={() => signOut()}>
+                  Sign Out
+                </Button> */}
+                <Button
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={() => signOut()}
+                >
                   Sign Out
                 </Button>
               </>
             ) : (
-              <Button onClick={() => signIn("google")}>Sign In</Button>
+              <Button className="w-full" onClick={() => signIn("google")}>
+                Sign In with Google
+              </Button>
             )}
           </PopoverContent>
         </Popover>
@@ -49,17 +58,51 @@ export default function Home() {
 
       {/* Main */}
       <div className="w-full max-w-4xl px-6 space-y-16">
-        <section className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
-            {user ? `Welcome back, ${user.name} 👋` : "Welcome 👋"}
-          </h1>
+        {!user && (
+          <section className="flex flex-col items-center text-center space-y-6 py-10">
+            <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+              Welcome 👋
+            </h1>
 
-          {!user && (
-            <Button onClick={() => signIn("google")} className="mt-4">
-              Sign in to continue →
-            </Button>
-          )}
-        </section>
+            <p className="text-gray-600 dark:text-gray-400 max-w-sm">
+              Sign in to access your dashboard, track problems, and continue
+              your learning journey.
+            </p>
+
+            {/* Login card */}
+            <div className="w-full max-w-sm bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 shadow-sm rounded-2xl p-6 flex flex-col items-center gap-6">
+              {/* Google Icon */}
+              <div className="h-14 w-14 rounded-full flex items-center justify-center bg-gray-100 dark:bg-zinc-800 shadow-inner">
+                <img
+                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                  alt="Google Logo"
+                  className="h-7 w-7"
+                />
+              </div>
+
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                Sign in with Google
+              </h2>
+
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Quick, secure, and no passwords needed.
+              </p>
+
+              <Button
+                onClick={() => signIn("google")}
+                className="w-full py-5 text-base font-medium flex items-center justify-center gap-3 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 transition"
+                variant="outline"
+              >
+                <img
+                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                  alt="google"
+                  className="h-5 w-5"
+                />
+                Continue with Google
+              </Button>
+            </div>
+          </section>
+        )}
 
         {user && (
           <>

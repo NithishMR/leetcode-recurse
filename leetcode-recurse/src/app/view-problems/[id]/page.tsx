@@ -25,61 +25,59 @@ const difficultyColors: any = {
 };
 
 // Icons (unchanged)
-const CalendarIcon = (props: any) => (
+export const CalendarIcon = (props: any) => (
   <svg
     {...props}
     xmlns="http://www.w3.org/2000/svg"
-    fill="none"
     viewBox="0 0 24 24"
-    strokeWidth={2}
+    fill="none"
     stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M6 7H18V19C19.1046 19 20 18.1046 20 17V7C20 5.89543 19.1046 5 18 5H6C4.89543 5 4 5.89543 4 7V17C4 18.1046 4.89543 19 6 19H18M6 7V3M18 7V3M9 12H15"
-    />
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 16h.01" />
-  </svg>
-);
-
-const ClockIcon = (props: any) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    strokeWidth={2}
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-    />
-  </svg>
-);
-
-const AcademicCapIcon = (props: any) => (
-  <svg
-    {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
     strokeWidth={1.8}
+    className="w-6 h-6 mr-2"
+  >
+    <rect x="3" y="4" width="18" height="18" rx="3" />
+    <line x1="3" y1="10" x2="21" y2="10" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+  </svg>
+);
+
+export const ClockIcon = (props: any) => (
+  <svg
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
     stroke="currentColor"
+    strokeWidth={1.8}
+    className="w-6 h-6 mr-2"
+  >
+    <circle cx="12" cy="12" r="9" />
+    <line x1="12" y1="7" x2="12" y2="12" />
+    <line x1="12" y1="12" x2="16" y2="14" />
+  </svg>
+);
+
+export const ReviewCountIcon = (props: any) => (
+  <svg
+    {...props}
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.8}
+    className="w-6 h-6 mr-2"
   >
     <path
+      d="M3 12a9 9 0 1 1 9 9"
       strokeLinecap="round"
       strokeLinejoin="round"
-      d="M12 3L2 8l10 5 10-5-10-5z"
     />
-    <path
+    <polyline
+      points="3 12 3 18 9 18"
       strokeLinecap="round"
       strokeLinejoin="round"
-      d="M6 10v5.5A6.5 6.5 0 0012 22a6.5 6.5 0 006-6.5V10"
     />
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 13l8-4" />
   </svg>
 );
 
@@ -133,16 +131,16 @@ export default function ProblemDetails() {
   return (
     <div className="min-h-screen bg-gray-50 py-10">
       <div className="max-w-5xl mx-auto px-4">
-        <div className="bg-white shadow-lg p-8 rounded-2xl mb-8 border">
+        <div className="bg-white shadow-lg p-8 rounded-2xl mb-8 border flex justify-between">
           <div className="flex flex-col sm:flex-row justify-between gap-4">
-            <div>
-              <h1 className="text-4xl font-extrabold text-gray-900">
+            <div className="flex flex-col justify-around">
+              <h1 className="text-4xl font-extrabold text-gray-900 font-mono">
                 {problem.problemName}
               </h1>
 
-              <p className="mt-2 text-lg text-gray-500 flex items-center">
+              <p className="mt-6 text-lg text-gray-500 flex items-center">
                 <img
-                  src={`https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${problem.source}.com&size=64`}
+                  src={`https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${problem.source}.com&size=32`}
                   alt="source icon"
                 />
                 <span className="font-semibold ml-1 text-gray-700">
@@ -153,7 +151,7 @@ export default function ProblemDetails() {
           </div>
           <Button
             variant={"outline"}
-            className=""
+            className="cursor-pointer"
             onClick={() => {
               handleReviewed();
               window.location.href = problem.problemUrl;
@@ -164,9 +162,9 @@ export default function ProblemDetails() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 justify-between sm:grid-cols-3 gap-6 mb-8">
           <StatCard
-            icon={<CalendarIcon className="w-6 h-6 mr-2" />}
+            icon={<CalendarIcon className="w-6 h-6 mr-5 " />}
             label="Solved On"
             value={formatDate(problem.dateSolved)}
             color="text-blue-600"
@@ -180,7 +178,7 @@ export default function ProblemDetails() {
           />
 
           <StatCard
-            icon={<AcademicCapIcon className="w-6 h-6 mr-2" />}
+            icon={<ReviewCountIcon className="w-6 h-6 mr-2" />}
             label="Times Reviewed"
             value={problem.timesSolved}
             color="text-purple-600"

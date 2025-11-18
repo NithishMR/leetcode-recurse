@@ -27,7 +27,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider refetchInterval={0} refetchOnWindowFocus={false}>
+          {children}
+        </SessionProvider>
       </body>
     </html>
   );
