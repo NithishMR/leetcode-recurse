@@ -1,45 +1,44 @@
 "use client";
-import { useEffect, useState } from "react";
+
 import CustomPieChart from "./CustomPieChart";
+import useSWR from "swr";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function DifficultyDistribution() {
-  const [loading, setLoading] = useState(true);
-  const [difficultyData, setDifficultyData] = useState([
-    { name: "Easy", value: 0 },
-    { name: "Medium", value: 0 },
-    { name: "Hard", value: 0 },
-  ]);
+  const { data, error, isLoading } = useSWR(
+    "/api/dashboard/difficulty-distribution",
+    fetcher
+  );
 
-  useEffect(() => {
-    async function fetchDifficultyStats() {
-      const res = await fetch("/api/dashboard/difficulty-distribution");
-      const data = await res.json();
-
-      setDifficultyData([
-        { name: "Easy", value: data.easy },
-        { name: "Medium", value: data.medium },
-        { name: "Hard", value: data.hard },
-      ]);
-      setLoading(false);
-    }
-
-    fetchDifficultyStats();
-  }, []);
-  if (loading)
+  if (isLoading)
     return (
       <div className="p-6 text-center text-gray-500">
-        Loading Difficulty distribution...
+        Loading difficulty distribution...
       </div>
     );
-  return (
-    <div>
-      <h1 className="text-center text-2xl font-semibold mt-4">
-        Difficulty Distribution
-      </h1>
 
-      <div className="flex justify-center mt-6 p-10">
-        <CustomPieChart data={difficultyData} />
-      </div>
+  if (error) {
+    return (
+      <p className="text-center mt-10 text-red-500">Failed to load progress.</p>
+    );
+  }
+
+  if (!data || (data.easy === 0 && data.medium === 0 && data.hard === 0)) {
+    return (
+      <p className="text-center text-gray-500">No activity recorded yet.</p>
+    );
+  }
+
+  return (
+    <div className="flex justify-center mt-6 p-10">
+      <CustomPieChart
+        data={[
+          { name: "Easy", value: data.easy },
+          { name: "Medium", value: data.medium },
+          { name: "Hard", value: data.hard },
+        ]}
+      />
     </div>
   );
 }

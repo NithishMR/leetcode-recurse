@@ -132,7 +132,7 @@ export default function Home() {
                 Problems to Solve This Week
               </h2>
 
-              <div className="flex justify-center">
+              <div className="w-[100%] m-auto ">
                 <UpcomingReviews />
               </div>
             </section>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import DeleteIcon from "@/../../public/deleteIcon.svg";
 import Link from "next/link";
+import useSWR from "swr";
 // Common props interface for all icons
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   className?: string;
@@ -107,43 +108,47 @@ const icons: Record<string, React.FC<IconProps>> = {
   edit: PencilIcon,
   delete: TrashIcon,
 };
-
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export default function RecentActivityLog() {
-  const [logs, setLogs] = useState<ActivityLog[]>([]);
-  const [loading, setLoading] = useState(true);
+  // const [logs, setLogs] = useState<ActivityLog[]>([]);
+  // const [loading, setLoading] = useState(true);
+  const { data, error, isLoading } = useSWR(
+    "/api/dashboard/recent-activity",
+    fetcher
+  );
+  // useEffect(() => {
+  //   const fetchLogs = async () => {
+  //     try {
+  //       const res = await fetch("/api/dashboard/recent-activity");
+  //       const data = await res.json();
+  //       setLogs(data);
+  //     } catch (error) {
+  //       console.error("Failed to fetch activity log", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-  useEffect(() => {
-    const fetchLogs = async () => {
-      try {
-        const res = await fetch("/api/dashboard/recent-activity");
-        const data = await res.json();
-        setLogs(data);
-      } catch (error) {
-        console.error("Failed to fetch activity log", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  //   fetchLogs();
+  // }, []);
 
-    fetchLogs();
-  }, []);
-
-  if (loading)
+  if (isLoading)
     return (
       <div className="bg-white p-6 rounded-xl shadow">
         <p className="text-gray-500">Loading activity...</p>
       </div>
     );
+  if (error) return <p className="text-red-500">Failed to load activity</p>;
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow border border-gray-100">
       <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Activity</h2>
 
-      {logs.length === 0 ? (
+      {data.length === 0 ? (
         <p className="text-gray-500 text-sm">No recent activity.</p>
       ) : (
         <ul className="space-y-4">
-          {logs.map((log) => {
+          {data.map((log: ActivityLog) => {
             const Icon = icons[log.type];
             return (
               <li

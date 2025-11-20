@@ -2,7 +2,6 @@ import { connectDB } from "@/database/connection";
 import Problem from "@/database/Problem";
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
-
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
@@ -18,18 +17,23 @@ export async function GET(req: NextRequest) {
 
     const userId = token.user.id;
 
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
+    // Normalize to start of day
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
 
-    const nextWeek = new Date(today);
-    nextWeek.setDate(today.getDate() + 7);
+    const startOfTomorrow = new Date(startOfToday);
+    startOfTomorrow.setDate(startOfToday.getDate() + 1);
 
-    // Only upcoming reviews for THIS user in the next 7 days
+    const startOfNextWeek = new Date(startOfToday);
+    startOfNextWeek.setDate(startOfToday.getDate() + 7);
+
     const reviews = await Problem.find(
       {
         userId,
-        nextReviewDate: { $gte: tomorrow, $lte: nextWeek },
+        nextReviewDate: {
+          $gte: startOfTomorrow,
+          $lt: startOfNextWeek,
+        },
       },
       {
         problemName: 1,
@@ -37,9 +41,7 @@ export async function GET(req: NextRequest) {
         difficulty: 1,
         nextReviewDate: 1,
       }
-    )
-      .sort({ nextReviewDate: 1 })
-      .limit(10);
+    ).sort({ nextReviewDate: 1 });
 
     return NextResponse.json({ reviews }, { status: 200 });
   } catch (error) {

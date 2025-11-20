@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import useSWR from "swr";
 
 interface ProblemSchema {
   _id: string;
@@ -12,33 +12,29 @@ interface ProblemSchema {
   nextReviewDate: string;
 }
 
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 export default function UpcomingReviews() {
-  const [upcoming, setUpcoming] = useState<ProblemSchema[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, error, isLoading } = useSWR(
+    "/api/dashboard/upcoming-reviews",
+    fetcher
+  );
 
-  useEffect(() => {
-    const fetchUpcoming = async () => {
-      try {
-        const res = await fetch("/api/dashboard/upcoming-reviews");
-        if (!res.ok) throw new Error("Failed to fetch upcoming reviews");
-        const { reviews } = await res.json();
-        setUpcoming(reviews);
-      } catch (error) {
-        console.error("Error fetching upcoming reviews:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUpcoming();
-  }, []);
-
-  if (loading)
+  if (isLoading)
     return (
       <div className="p-6 text-center text-gray-500">
         Loading upcoming reviews...
       </div>
     );
+
+  if (error)
+    return (
+      <div className="p-6 text-center text-red-500">
+        Failed to load upcoming reviews.
+      </div>
+    );
+
+  const upcoming: ProblemSchema[] = data?.reviews ?? [];
 
   if (upcoming.length === 0)
     return (
@@ -99,10 +95,7 @@ export default function UpcomingReviews() {
                 <p className="text-xs text-gray-400">
                   {new Date(problem.nextReviewDate).toLocaleDateString(
                     "en-US",
-                    {
-                      month: "short",
-                      day: "numeric",
-                    }
+                    { month: "short", day: "numeric" }
                   )}
                 </p>
               </div>
@@ -110,6 +103,7 @@ export default function UpcomingReviews() {
           );
         })}
       </div>
+
       <div className="flex justify-center items-center">
         <Link href={"/dashboard/upcoming-reviews"}>
           <Button variant={"link"}>See all the Upcoming problems</Button>

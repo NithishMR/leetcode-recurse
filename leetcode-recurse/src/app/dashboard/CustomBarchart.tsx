@@ -1,5 +1,5 @@
 "use client";
-
+import useSWR from "swr";
 import { useState, useEffect } from "react";
 import {
   BarChart,
@@ -22,27 +22,38 @@ interface CustomBarChartProps {
   isAnimationActive?: boolean;
 }
 
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 export default function CustomBarChart({
   isAnimationActive = true,
 }: CustomBarChartProps) {
-  const [data, setData] = useState<WeeklyData[]>([]);
-  const [loading, setLoading] = useState(true);
+  // const [data, setData] = useState<WeeklyData[]>([]);
+  // const [loading, setLoading] = useState(true);
   // Fetch from backend API (replace with your route)
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetch("/api/dashboard/weekly-progress");
-      const json = await res.json();
-      setData(json);
-      setLoading(false);
-    };
-    fetchData();
-  }, []);
-  if (loading)
+  const { data, error, isLoading } = useSWR(
+    "/api/dashboard/weekly-progress",
+    fetcher
+  );
+
+  if (isLoading)
     return (
       <div className="p-6 text-center text-gray-500">
         Loading progress over time...
       </div>
     );
+  if (error) {
+    return (
+      <p className="text-center mt-10 text-red-500">
+        Failed to load progress over time.
+      </p>
+    );
+  }
+  if (data?.length === 0) {
+    return (
+      <p className="text-center text-gray-500">No activity recorded yet.</p>
+    );
+  }
+
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
       <h2 className="text-lg font-semibold text-gray-800 mb-4">
