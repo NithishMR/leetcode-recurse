@@ -29,26 +29,41 @@ export default function Home() {
             </Avatar>
           </PopoverTrigger>
 
-          <PopoverContent className="w-48 space-y-2">
+          <PopoverContent className="w-52 p-3 space-y-3 rounded-xl shadow-lg border bg-white dark:bg-zinc-900">
             {user ? (
               <>
-                <div className="text-sm text-gray-700 dark:text-gray-300">
-                  Signed in as <b>{user.name}</b>
+                {/* USER INFO */}
+                <div className="text-sm text-gray-700 dark:text-gray-300 ">
+                  Signed in as <br />
+                  <b className="text-gray-900 dark:text-white">{user.name}</b>
                 </div>
 
-                {/* <Button variant="outline" onClick={() => signOut()}>
-                  Sign Out
-                </Button> */}
-                <Button
-                  variant="outline"
-                  className="w-full justify-start"
-                  onClick={() => signOut()}
-                >
-                  Sign Out
-                </Button>
+                {/* ACCOUNT SETTINGS */}
+                <div className="flex flex-col justify-around gap-2">
+                  <Link href="/account-settings">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left cursor-pointer"
+                    >
+                      Account Settings
+                    </Button>
+                  </Link>
+
+                  {/* SIGN OUT */}
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start cursor-pointer"
+                    onClick={() => signOut()}
+                  >
+                    Sign Out
+                  </Button>
+                </div>
               </>
             ) : (
-              <Button className="w-full" onClick={() => signIn("google")}>
+              <Button
+                className="w-full cursor-pointer"
+                onClick={() => signIn("google")}
+              >
                 Sign In with Google
               </Button>
             )}
@@ -90,7 +105,7 @@ export default function Home() {
 
               <Button
                 onClick={() => signIn("google")}
-                className="w-full py-5 text-base font-medium flex items-center justify-center gap-3 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 transition"
+                className="w-full py-5 text-base font-medium flex items-center justify-center gap-3 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 transition cursor-pointer"
                 variant="outline"
               >
                 <img

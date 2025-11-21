@@ -82,7 +82,7 @@ export default function UserActions({ data, onDelete }: UserActionsProps) {
                 body: JSON.stringify(updatedProblem),
               });
 
-              location.reload();
+              // location.reload();
             }}
           >
             <div className="grid gap-2">

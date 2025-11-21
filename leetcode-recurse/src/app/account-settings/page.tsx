@@ -91,6 +91,7 @@ export default function AccountSettings() {
               id="theme"
               checked={darkMode}
               onCheckedChange={setDarkMode}
+              disabled
             />
           </div>
 
@@ -105,6 +106,7 @@ export default function AccountSettings() {
               id="emailReminders"
               checked={emailReminders}
               onCheckedChange={setEmailReminders}
+              disabled
             />
           </div>
         </section>

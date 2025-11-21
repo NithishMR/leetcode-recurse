@@ -26,6 +26,7 @@ import FilterDropdown from "./FilterDropdown";
 import FilterIcon from "@/../../public/filter.svg";
 import ResetIcon from "@/../../public/reset.svg";
 import Image from "next/image";
+import useSWR from "swr";
 type ProblemDataStructure = {
   _id: string;
   problemName: string;
@@ -37,12 +38,15 @@ type ProblemDataStructure = {
   timesSolved: number;
   nextReviewDate: string;
 };
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 function ProblemsViewPage() {
   const router = useRouter();
-  const [totalPages, setTotalPages] = useState<number>(0);
+  // const [totalPages, setTotalPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [data, setData] = useState<ProblemDataStructure[]>([]);
-  const [loading, setLoading] = useState(true);
+  //const [data, setData] = useState<ProblemDataStructure[]>([]);
+  // const [loading, setLoading] = useState(true);
   //for fileter
   const [difficultyFilter, setDifficultyFilter] = useState("any");
   const [sourceFilter, setSourceFilter] = useState("any");
@@ -51,44 +55,48 @@ function ProblemsViewPage() {
   const [filteredData, setFilteredData] = useState<ProblemDataStructure[]>([]);
   const [isFilterOn, setIsFilterOn] = useState<boolean>(false);
   // filter end
-  useEffect(() => {
-    const fetchPage = async () => {
-      try {
-        const res = await fetch(`/api/problems?page=${currentPage}&limit=10`);
-        const result = await res.json();
-        setData(result.problems);
-        setTotalPages(result.totalPages);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setTimeout(() => setLoading(false), 500);
-      }
-    };
+  const { data, error, isLoading } = useSWR(
+    `/api/problems?page=${currentPage}&limit=10`,
+    fetcher
+  );
+  // useEffect(() => {
+  //   const fetchPage = async () => {
+  //     try {
+  //       const res = await fetch(`/api/problems?page=${currentPage}&limit=10`);
+  //       const result = await res.json();
+  //       // setData(result.problems);
+  //       // setTotalPages(result.totalPages);
+  //     } catch (error) {
+  //       console.log(error);
+  //     } finally {
+  //       setTimeout(() => setLoading(false), 500);
+  //     }
+  //   };
 
-    fetchPage();
-  }, [currentPage]);
-  const handleReviewed = async (id: string) => {
-    await toast.promise(
-      async () => {
-        const res = await fetch(`/api/problems/review/${id}`, {
-          method: "POST",
-        });
+  //   fetchPage();
+  // }, [currentPage]);
+  // const handleReviewed = async (id: string) => {
+  //   await toast.promise(
+  //     async () => {
+  //       const res = await fetch(`/api/problems/review/${id}`, {
+  //         method: "POST",
+  //       });
 
-        if (!res.ok) throw new Error("Failed to review");
+  //       if (!res.ok) throw new Error("Failed to review");
 
-        const saved = await res.json();
-        console.log("Problem reviewed:", saved);
+  //       const saved = await res.json();
+  //       console.log("Problem reviewed:", saved);
 
-        router.refresh(); //  correct
-        return saved;
-      },
-      {
-        loading: "Reviewing problem...",
-        success: "Successfully reviewed the problem!",
-        error: " Could not review problem",
-      }
-    );
-  };
+  //       router.refresh(); //  correct
+  //       return saved;
+  //     },
+  //     {
+  //       loading: "Reviewing problem...",
+  //       success: "Successfully reviewed the problem!",
+  //       error: " Could not review problem",
+  //     }
+  //   );
+  // };
 
   const handleProblemDelete = async (_id: string) => {
     await toast.promise(
@@ -118,7 +126,7 @@ function ProblemsViewPage() {
   //handle filter
   const handleFilter = () => {
     setIsFilterOn(true);
-    let filtered = [...data];
+    let filtered = [...data.problems];
 
     //  Difficulty filter
     if (difficultyFilter !== "any") {
@@ -194,10 +202,16 @@ function ProblemsViewPage() {
   //   if (next.toDateString() === today.toDateString()) return "Due Today";
   //   return "Missed ";
   // };
-  if (loading)
+  if (isLoading)
     return (
       <div className="flex justify-center items-center h-screen bg-gray-50">
         <p className="text-xl font-medium text-gray-700">Loading problem ...</p>
+      </div>
+    );
+  if (error)
+    return (
+      <div className="p-6 text-center text-red-500">
+        Failed to load upcoming reviews.
       </div>
     );
   return (
@@ -330,7 +344,7 @@ function ProblemsViewPage() {
             <div className="">
               <Table className="text-sm">
                 <TableCaption>
-                  You have {totalPages} pages of problems.
+                  You have {data.totalPages} pages of problems.
                 </TableCaption>
 
                 <TableHeader>
@@ -345,7 +359,7 @@ function ProblemsViewPage() {
                 </TableHeader>
 
                 <TableBody>
-                  {data.length === 0 ? (
+                  {data.problems.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={8} className="text-center py-6">
                         No problems added yet.
@@ -409,7 +423,7 @@ function ProblemsViewPage() {
             <div className="">
               <Table className="text-sm">
                 <TableCaption>
-                  You have {totalPages} pages of problems.
+                  You have {data.totalPages} pages of problems.
                 </TableCaption>
 
                 <TableHeader>
@@ -424,62 +438,64 @@ function ProblemsViewPage() {
                 </TableHeader>
 
                 <TableBody>
-                  {data.length === 0 ? (
+                  {data.problems.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={8} className="text-center py-6">
                         No problems added yet.
                       </TableCell>
                     </TableRow>
                   ) : (
-                    data.map((datum, index) => (
-                      <TableRow key={index} className="hover:bg-gray-50">
-                        <TableCell className="font-medium">
-                          <Link href={`view-problems/${datum._id}`}>
-                            <div className="flex items-center gap-4">
-                              <img
-                                src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${datum.source}.com&size=64`}
-                                alt="platform icon"
-                                width="25"
-                                height="25"
-                                className="rounded-xl"
-                              />
-                              {datum.problemName}
-                            </div>
-                          </Link>
-                        </TableCell>
+                    data.problems.map(
+                      (datum: ProblemDataStructure, index: number) => (
+                        <TableRow key={index} className="hover:bg-gray-50">
+                          <TableCell className="font-medium">
+                            <Link href={`view-problems/${datum._id}`}>
+                              <div className="flex items-center gap-4">
+                                <img
+                                  src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${datum.source}.com&size=64`}
+                                  alt="platform icon"
+                                  width="25"
+                                  height="25"
+                                  className="rounded-xl"
+                                />
+                                {datum.problemName}
+                              </div>
+                            </Link>
+                          </TableCell>
 
-                        <TableCell className="capitalize">
-                          <ProblemDifficultyStatus
-                            difficulty={datum.difficulty}
-                          />
-                        </TableCell>
+                          <TableCell className="capitalize">
+                            <ProblemDifficultyStatus
+                              difficulty={datum.difficulty}
+                            />
+                          </TableCell>
 
-                        <TableCell>
-                          {new Date(datum.dateSolved).toLocaleDateString()}
-                        </TableCell>
+                          <TableCell>
+                            {new Date(datum.dateSolved).toLocaleDateString()}
+                          </TableCell>
 
-                        <TableCell className="font-semibold text-center">
-                          <ProblemStatus
-                            nextReviewDate={datum.nextReviewDate}
-                            timesSolved={datum.timesSolved}
-                          />
-                        </TableCell>
+                          <TableCell className="font-semibold text-center">
+                            <ProblemStatus
+                              nextReviewDate={datum.nextReviewDate}
+                              timesSolved={datum.timesSolved}
+                            />
+                          </TableCell>
 
-                        {/* <TableCell className="flex items-center justify-center">
+                          {/* <TableCell className="flex items-center justify-center">
                     {datum.timesSolved}
                   </TableCell> */}
 
-                        {/* <TableCell>
+                          {/* <TableCell>
                     {new Date(datum.nextReviewDate).toLocaleDateString()}
                   </TableCell> */}
-                        <TableCell className="">
-                          <UserActions
-                            data={datum}
-                            onDelete={handleProblemDelete}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))
+                          <TableCell className="">
+                            <UserActions
+                              data={datum}
+                              onDelete={handleProblemDelete}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      )
+                    )
                   )}
                 </TableBody>
               </Table>
@@ -498,12 +514,12 @@ function ProblemsViewPage() {
             </Button>
 
             <span className="text-sm text-gray-700 bg-gray-100 px-3 py-1 rounded-md border">
-              Page <b>{currentPage}</b> of <b>{totalPages}</b>
+              Page <b>{currentPage}</b> of <b>{data.totalPages}</b>
             </span>
 
             <Button
               onClick={() => setCurrentPage((prev) => prev + 1)}
-              disabled={currentPage === totalPages}
+              disabled={currentPage === data.totalPages}
               variant="outline"
               className="px-4 py-2 cursor-pointer"
             >
