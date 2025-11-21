@@ -107,7 +107,10 @@ export default function Home() {
         {user && (
           <>
             <section className="space-y-6">
-              <h2 className="text-3xl font-bold text-center">Navigation</h2>
+              <h2 className="text-3xl font-bold text-center">
+                {" "}
+                Programmatic Navigation
+              </h2>
 
               <div className="bg-white dark:bg-zinc-900 shadow-sm border rounded-xl p-6 space-y-3 text-lg">
                 <p>
@@ -132,7 +135,7 @@ export default function Home() {
                 Problems to Solve This Week
               </h2>
 
-              <div className="w-[100%] m-auto ">
+              <div className="w-full m-auto ">
                 <UpcomingReviews />
               </div>
             </section>
