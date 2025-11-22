@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Documentation() {
   return (
-    <div className="min-h-screen bg-white text-gray-800 px-4 sm:px-6 py-12">
+    <div className="min-h-screen bg-white text-gray-800 px-4 sm:px-6 py-12 mt-14">
       {/* HEADER */}
       <header className="text-center mb-12 sm:mb-16">
         <h1 className="text-3xl sm:text-4xl font-bold">📘 Documentation</h1>

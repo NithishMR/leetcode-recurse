@@ -124,7 +124,7 @@ export default function Dashboard() {
   const { problemCount, reviewedToday, pendingToday, overdue } = data;
 
   return (
-    <div className="px-6 py-8">
+    <div className="px-6 py-8 mt-10">
       <h1 className="text-center text-3xl font-bold tracking-tight mb-10">
         Your Progress & Analytics
       </h1>

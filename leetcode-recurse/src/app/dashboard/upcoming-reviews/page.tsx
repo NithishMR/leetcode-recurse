@@ -44,7 +44,7 @@ export default function UpcomingReviews() {
     );
 
   return (
-    <div className=" bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+    <div className=" bg-white p-6 rounded-2xl shadow-md border border-gray-100 mt-14">
       <h2 className="text-xl font-semibold mb-4 text-gray-800">
         Upcoming Reviews (Next 7 Days)
       </h2>

@@ -95,7 +95,7 @@ export default function ProblemDetails() {
     );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 py-12 mt-10">
       <div className="max-w-4xl mx-auto space-y-10 px-4">
         {/* HEADER */}
         <div className="bg-white p-8 shadow-lg rounded-2xl border flex justify-between items-center">

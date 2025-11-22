@@ -215,7 +215,7 @@ function ProblemsViewPage() {
       </div>
     );
   return (
-    <div className="">
+    <div className="mt-14">
       <div className="flex justify-center py-6">
         <div className="w-full max-w-6xl bg-white p-6 rounded-xl shadow-sm">
           <div className="flex flex-row justify-around items-center relative">

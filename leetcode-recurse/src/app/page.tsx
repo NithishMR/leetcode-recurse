@@ -16,9 +16,9 @@ export default function Home() {
   const user = session?.user;
 
   return (
-    <div className="relative min-h-screen w-full bg-zinc-50 dark:bg-black flex items-start justify-center py-12">
+    <div className="relative min-h-screen w-full bg-zinc-50 dark:bg-black flex items-start justify-center py-12 mt-10">
       {/* Avatar + Account Popover */}
-      <div className="fixed top-4 right-4 z-50">
+      <div className="fixed bottom-3 right-4 z-50">
         <Popover>
           <PopoverTrigger>
             <Avatar className="cursor-pointer shadow">
@@ -128,19 +128,36 @@ export default function Home() {
               </h2>
 
               <div className="bg-white dark:bg-zinc-900 shadow-sm border rounded-xl p-6 space-y-3 text-lg">
-                <p>
-                  Dashboard → <code className="text-blue-600">/dashboard</code>
+                <p className="cursor-pointer">
+                  Dashboard →{" "}
+                  <Link href="/dashboard">
+                    <code className="text-blue-600">/dashboard</code>
+                  </Link>
                 </p>
                 <p>
-                  Add Problem → <code className="text-blue-600">/problems</code>
+                  Add Problem →{" "}
+                  <Link href="/problems">
+                    <code className="text-blue-600">/problems</code>
+                  </Link>
                 </p>
+
                 <p>
                   View Problems →{" "}
-                  <code className="text-blue-600">/view-problems</code>
+                  <Link href="/view-problems">
+                    <code className="text-blue-600">/view-problems</code>
+                  </Link>
                 </p>
                 <p>
                   Account Settings →{" "}
-                  <code className="text-blue-600">/account-settings</code>
+                  <Link href="account-settings">
+                    <code className="text-blue-600">/account-settings</code>
+                  </Link>
+                </p>
+                <p>
+                  Documentation →{" "}
+                  <Link href="/docs">
+                    <code className="text-blue-600">/docs</code>
+                  </Link>
                 </p>
               </div>
             </section>

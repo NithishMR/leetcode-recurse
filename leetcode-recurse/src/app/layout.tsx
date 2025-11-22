@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
 import "./globals.css";
+import Navbar from "./Navbar";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -28,6 +29,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <SessionProvider refetchInterval={0} refetchOnWindowFocus={false}>
+          <Navbar />
           {children}
         </SessionProvider>
       </body>

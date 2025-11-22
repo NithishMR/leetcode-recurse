@@ -17,7 +17,7 @@ export default function AccountSettings() {
   const [emailReminders, setEmailReminders] = useState(true);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-black flex items-start justify-center py-6 px-3 sm:py-12 sm:px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-black flex items-start justify-center py-6 px-3 sm:py-12 sm:px-4 mt-14">
       <div className="w-full max-w-3xl bg-white dark:bg-zinc-900 rounded-xl sm:rounded-2xl shadow-lg p-6 sm:p-10 space-y-10 border border-gray-200 dark:border-zinc-800">
         {/* Header */}
         <h1 className="text-3xl sm:text-4xl font-bold text-center text-gray-900 dark:text-white">

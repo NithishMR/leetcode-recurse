@@ -108,7 +108,7 @@ const ProblemAdditionPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-start p-6 space-y-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-start p-6 space-y-8 mt-14">
       <div className="w-full max-w-4xl bg-white shadow-xl rounded-2xl p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
         <h1 className="col-span-1 md:col-span-2 text-3xl font-bold text-gray-800 text-center mb-6">
           Add a New Problem

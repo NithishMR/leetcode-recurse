@@ -141,7 +141,7 @@ export default function RecentActivityLog() {
   if (error) return <p className="text-red-500">Failed to load activity</p>;
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow border border-gray-100">
+    <div className="bg-white p-6 rounded-2xl shadow border border-gray-100 mt-20">
       <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Activity</h2>
 
       {data.length === 0 ? (
