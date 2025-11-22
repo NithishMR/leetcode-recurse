@@ -1,16 +1,14 @@
+// src/database/User.ts
 import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
     name: { type: String },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true, index: true },
     image: { type: String },
 
-    // OAuth-specific fields
-    provider: { type: String }, // e.g. 'google'
-    providerAccountId: { type: String }, // Google's user ID
-
-    // You may add more fields later
+    provider: { type: String },
+    providerAccountId: { type: String },
   },
   { timestamps: true }
 );

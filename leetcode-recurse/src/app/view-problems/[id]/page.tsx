@@ -114,14 +114,25 @@ export default function ProblemDetails() {
               <span className="font-medium">{problem.source}</span>
             </div>
           </div>
+          {problem.status === "completed" && (
+            <Button
+              variant="default"
+              className="px-5 py-3 text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
+              disabled
+            >
+              Problem expired →
+            </Button>
+          )}
 
-          <Button
-            variant="default"
-            className="px-5 py-3 text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
-            onClick={handleReviewed}
-          >
-            Solve the Problem →
-          </Button>
+          {problem.status !== "completed" && (
+            <Button
+              variant="default"
+              className="px-5 py-3 text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
+              onClick={handleReviewed}
+            >
+              Solve the Problem →
+            </Button>
+          )}
         </div>
 
         {/* STATS */}

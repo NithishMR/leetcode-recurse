@@ -57,6 +57,19 @@ export async function PUT(req: NextRequest) {
       problemId: updatedProblem._id,
       problemName: updatedProblem.problemName,
     });
+    const logsCount = await ActivityLog.countDocuments({ userId });
+
+    if (logsCount > 20) {
+      const deleteCount = logsCount - 20;
+
+      const oldestLogs = await ActivityLog.find({ userId })
+        .sort({ createdAt: 1 })
+        .limit(deleteCount);
+
+      const idsToDelete = oldestLogs.map((l) => l._id);
+
+      await ActivityLog.deleteMany({ _id: { $in: idsToDelete } });
+    }
 
     return NextResponse.json(updatedProblem, { status: 200 });
   } catch (error) {

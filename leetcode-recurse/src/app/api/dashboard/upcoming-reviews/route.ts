@@ -2,6 +2,7 @@ import { connectDB } from "@/database/connection";
 import Problem from "@/database/Problem";
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
@@ -21,19 +22,18 @@ export async function GET(req: NextRequest) {
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 
-    const startOfTomorrow = new Date(startOfToday);
-    startOfTomorrow.setDate(startOfToday.getDate() + 1);
-
     const startOfNextWeek = new Date(startOfToday);
     startOfNextWeek.setDate(startOfToday.getDate() + 7);
 
+    // ⛳ FIX HERE → include today:
     const reviews = await Problem.find(
       {
         userId,
         nextReviewDate: {
-          $gte: startOfTomorrow,
-          $lt: startOfNextWeek,
+          $gte: startOfToday, // include TODAY
+          $lt: startOfNextWeek, // include next 7 days
         },
+        status: { $ne: "completed" },
       },
       {
         problemName: 1,

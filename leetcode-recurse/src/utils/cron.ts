@@ -5,7 +5,7 @@ import User from "@/database/User";
 import { sendEmailSummary } from "./email";
 import mongoose from "mongoose";
 
-cron.schedule("*/10 * * * * *", async () => {
+cron.schedule("* * * * * *", async () => {
   console.log("schedulin");
   try {
     await connectDB();

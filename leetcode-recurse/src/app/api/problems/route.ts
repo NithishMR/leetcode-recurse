@@ -48,6 +48,19 @@ export async function POST(req: NextRequest) {
       problemId: problem._id,
       problemName: problem.problemName,
     });
+    const logsCount = await ActivityLog.countDocuments({ userId });
+
+    if (logsCount > 20) {
+      const deleteCount = logsCount - 20;
+
+      const oldestLogs = await ActivityLog.find({ userId })
+        .sort({ createdAt: 1 })
+        .limit(deleteCount);
+
+      const idsToDelete = oldestLogs.map((l) => l._id);
+
+      await ActivityLog.deleteMany({ _id: { $in: idsToDelete } });
+    }
 
     return NextResponse.json(problem, { status: 201 });
   } catch (error) {
@@ -136,6 +149,19 @@ export async function DELETE(req: NextRequest) {
       problemId: deleted._id,
       problemName: deleted.problemName,
     });
+    const logsCount = await ActivityLog.countDocuments({ userId });
+
+    if (logsCount > 20) {
+      const deleteCount = logsCount - 20;
+
+      const oldestLogs = await ActivityLog.find({ userId })
+        .sort({ createdAt: 1 })
+        .limit(deleteCount);
+
+      const idsToDelete = oldestLogs.map((l) => l._id);
+
+      await ActivityLog.deleteMany({ _id: { $in: idsToDelete } });
+    }
 
     if (!deleted) {
       return NextResponse.json({ error: "Problem not found" }, { status: 404 });

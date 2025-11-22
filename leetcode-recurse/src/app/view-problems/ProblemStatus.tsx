@@ -23,7 +23,7 @@ const getStatusColor = (status: string) => {
 const getReviewStatus = (nextDate: string, noOfTimesSolved: number) => {
   const today = new Date();
   const next = new Date(nextDate);
-  if (noOfTimesSolved >= 7) return "Retired";
+  if (noOfTimesSolved >= 4) return "Retired";
   if (next > today) return "Active";
   if (next.toDateString() === today.toDateString()) return "Due Today";
   return "Missed";

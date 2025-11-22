@@ -63,43 +63,49 @@ export default function UpcomingReviews() {
           };
 
           return (
-            <div
-              key={problem._id}
-              className="flex justify-between items-center py-3 hover:bg-gray-50 transition-all px-2 rounded-lg"
-            >
-              <div className="flex flex-col">
-                <span className="font-medium text-gray-900">
-                  {problem.problemName}
-                </span>
-                <span className="text-sm text-gray-500 capitalize">
-                  {problem.source} •
-                  <span
-                    className={
-                      problem.difficulty === "easy"
-                        ? "text-green-700"
-                        : problem.difficulty === "medium"
-                        ? "text-yellow-700"
-                        : "text-red-700"
-                    }
-                  >
-                    {" "}
-                    {problem.difficulty}
+            <Link key={problem._id} href={`/view-problems/${problem._id}`}>
+              <div className="flex justify-between items-center py-3 hover:bg-gray-50 transition-all px-2 rounded-lg">
+                <div className="flex flex-col">
+                  <span className="font-medium text-gray-900">
+                    {problem.problemName}
                   </span>
-                </span>
-              </div>
+                  <span className="text-sm text-gray-500 capitalize">
+                    {problem.source} •
+                    <span
+                      className={
+                        problem.difficulty === "easy"
+                          ? "text-green-700"
+                          : problem.difficulty === "medium"
+                          ? "text-yellow-700"
+                          : "text-red-700"
+                      }
+                    >
+                      {" "}
+                      {problem.difficulty}
+                    </span>
+                  </span>
+                </div>
 
-              <div className="text-right">
-                <p className={`font-semibold ${getColor()}`}>
-                  {daysLeft} {daysLeft === 1 ? "day" : "days"} left
-                </p>
-                <p className="text-xs text-gray-400">
-                  {new Date(problem.nextReviewDate).toLocaleDateString(
-                    "en-US",
-                    { month: "short", day: "numeric" }
-                  )}
-                </p>
+                <div className="text-right">
+                  <p className={`font-semibold ${getColor()}`}>
+                    {daysLeft === 0
+                      ? "Today"
+                      : daysLeft === 1
+                      ? "1 day left"
+                      : `${daysLeft} days left`}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {new Date(problem.nextReviewDate).toLocaleDateString(
+                      "en-US",
+                      {
+                        month: "short",
+                        day: "numeric",
+                      }
+                    )}
+                  </p>
+                </div>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>

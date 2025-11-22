@@ -1,4 +1,5 @@
-import mongoose, { Schema, models, model } from "mongoose";
+// src/database/ActivityLog.ts
+import mongoose, { Schema, model, models } from "mongoose";
 
 const ActivityLogSchema = new Schema(
   {
@@ -6,6 +7,7 @@ const ActivityLogSchema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
 
     type: {
@@ -30,10 +32,11 @@ const ActivityLogSchema = new Schema(
       default: Date.now,
     },
   },
-  {
-    timestamps: true, // includes createdAt & updatedAt
-  }
+  { timestamps: true }
 );
+
+// Important: faster cleanup (delete oldest)
+ActivityLogSchema.index({ userId: 1, createdAt: 1 });
 
 const ActivityLog =
   models.ActivityLog || model("ActivityLog", ActivityLogSchema);

@@ -43,6 +43,13 @@ export async function POST(
         { status: 404 }
       );
     }
+    //4.0
+    if (problem.timesSolved >= 4) {
+      problem.status = "completed";
+      problem.nextReviewDate = null;
+      await problem.save();
+      return NextResponse.json(problem, { status: 200 });
+    }
 
     // 4. LOG REVIEW
     await ActivityLog.create({
@@ -51,6 +58,19 @@ export async function POST(
       problemId: problem._id,
       problemName: problem.problemName,
     });
+    const logsCount = await ActivityLog.countDocuments({ userId });
+
+    if (logsCount > 20) {
+      const deleteCount = logsCount - 20;
+
+      const oldestLogs = await ActivityLog.find({ userId })
+        .sort({ createdAt: 1 })
+        .limit(deleteCount);
+
+      const idsToDelete = oldestLogs.map((l) => l._id);
+
+      await ActivityLog.deleteMany({ _id: { $in: idsToDelete } });
+    }
 
     // 5. INCREMENT TIMES SOLVED
     problem.timesSolved = (problem.timesSolved || 0) + 1;
