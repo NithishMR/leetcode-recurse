@@ -14,10 +14,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 
-import Details from "../../../public/Details.svg";
-import Edit from "../../../public/Edit.svg";
-import Delete from "../../../public/Delete.svg";
-import CheckBox from "../../../public/checkbox.svg";
+// import Details from "../../../public/Details.svg";
+// // import Edit from "../../../public/Edit.svg";
+// // import Delete from "../../../public/Delete.svg";
+// import CheckBox from "../../../public/checkbox.svg";
 
 interface UserActionsProps {
   data: any; // single problem row (datum)
@@ -47,7 +47,7 @@ export default function UserActions({ data, onDelete }: UserActionsProps) {
             title="Edit"
             className="shrink-0 p-2 rounded-lg hover:bg-gray-100 transition cursor-pointer "
           >
-            <Image src={Edit} width={18} height={18} alt="Edit" />
+            <Image src="/Edit.svg" width={18} height={18} alt="Edit" />
           </button>
         </DialogTrigger>
 
@@ -188,7 +188,7 @@ export default function UserActions({ data, onDelete }: UserActionsProps) {
             title="Delete"
             className="shrink-0 cursor-pointer"
           >
-            <Image src={Delete} width={20} height={20} alt="Delete" />
+            <Image src="/Delete.svg" width={20} height={20} alt="Delete" />
           </button>
         </DialogTrigger>
 
