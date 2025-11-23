@@ -10,12 +10,21 @@ export async function GET() {
     await connectDB();
 
     const now = new Date();
-    const startOfDayUTC = new Date(
-      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
-    );
-    const endOfDayUTC = new Date(
-      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)
-    );
+    // const startOfDayUTC = new Date(
+    //   Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+    // );
+    // const endOfDayUTC = new Date(
+    //   Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)
+    // );
+    const startOfDayUTC = new Date(now);
+    startOfDayUTC.setUTCHours(0, 0, 0, 0);
+
+    const endOfDayUTC = new Date(now);
+    endOfDayUTC.setUTCHours(23, 59, 59, 999);
+
+    // logs
+    console.log("startOfDayUTC:", startOfDayUTC.toISOString());
+    console.log("endOfDayUTC:", endOfDayUTC.toISOString());
 
     // 1) Get all problems due today
     const problemsDueToday = await Problem.find({

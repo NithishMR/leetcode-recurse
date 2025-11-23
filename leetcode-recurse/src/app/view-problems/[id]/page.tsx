@@ -68,8 +68,10 @@ export default function ProblemDetails() {
 
   const [problem, setProblem] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [clicked, setClicked] = useState(false);
 
   const handleReviewed = async () => {
+    setClicked(true);
     try {
       await fetch(`/api/problems/review/${id}`, { method: "POST" });
       window.location.href = problem.problemUrl;
@@ -114,7 +116,7 @@ export default function ProblemDetails() {
               <span className="font-medium">{problem.source}</span>
             </div>
           </div>
-          {problem.status === "completed" && (
+          {/* {problem.status === "completed" && (
             <Button
               variant="default"
               className="px-5 py-3 text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
@@ -131,6 +133,20 @@ export default function ProblemDetails() {
               onClick={handleReviewed}
             >
               Solve the Problem →
+            </Button>
+          )} */}
+          {/* third button */}
+          {problem.status !== "completed" && (
+            <Button
+              variant="default"
+              disabled={clicked}
+              className={
+                "px-5 py-3 text-white bg-blue-600 hover:bg-blue-700 cursor-pointer " +
+                (clicked ? "opacity-50 cursor-not-allowed" : "")
+              }
+              onClick={!clicked ? handleReviewed : undefined}
+            >
+              {clicked ? "Already clicked →" : "Solve the Problem →"}
             </Button>
           )}
         </div>

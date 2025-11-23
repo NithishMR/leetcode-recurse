@@ -44,25 +44,14 @@ const ProblemAdditionPage = () => {
   const [source, setSource] = useState<string>(""); // renamed platform -> source
   const [notes, setNotes] = useState<string>("");
   const [dateSolved, setDateSolved] = useState<Date | undefined>(undefined);
+  const [adding, setAdding] = useState(false);
 
   // Handle form submission
   const handleAddProblem = async () => {
-    if (!problemName.trim()) {
-      toast.error("Problem name is required");
-      return;
-    }
-    if (!problemUrl.trim()) {
-      toast.error("Problem URL is required");
-      return;
-    }
-    if (!source.trim()) {
-      toast.error("Platform name is required");
-      return;
-    }
-    if (!dateSolved) {
-      toast.error("Select a solved date");
-      return;
-    }
+    if (!problemName.trim()) return toast.error("Problem name is required");
+    if (!problemUrl.trim()) return toast.error("Problem URL is required");
+    if (!source.trim()) return toast.error("Platform name is required");
+    if (!dateSolved) return toast.error("Select a solved date");
 
     const newProblem = {
       problemName,
@@ -76,6 +65,8 @@ const ProblemAdditionPage = () => {
         : undefined,
     };
 
+    setAdding(true); // 🔥 disable button immediately
+
     await toast.promise(
       async () => {
         const res = await fetch("/api/problems", {
@@ -84,12 +75,14 @@ const ProblemAdditionPage = () => {
           body: JSON.stringify(newProblem),
         });
 
-        if (!res.ok) throw new Error("Failed to save");
+        if (!res.ok) {
+          setAdding(false); // re-enable on error
+          throw new Error("Failed to save");
+        }
 
         const saved = await res.json();
-        console.log("Problem saved:", saved);
 
-        // Reset fields
+        // Reset inputs
         setProblemName("");
         setProblemUrl("");
         setDifficulty("Easy");
@@ -97,12 +90,14 @@ const ProblemAdditionPage = () => {
         setNotes("");
         setDateSolved(undefined);
 
+        setAdding(false); // enable again
+
         return saved;
       },
       {
         loading: "Adding problem...",
-        success: `${problemName} added successfully `,
-        error: "Could not add problem ",
+        success: `${problemName} added successfully`,
+        error: "Could not add problem",
       }
     );
   };
@@ -186,7 +181,7 @@ const ProblemAdditionPage = () => {
         </div>
 
         {/* Submit Button */}
-        <div className="flex justify-center md:col-span-2 mt-4">
+        {/* <div className="flex justify-center md:col-span-2 mt-4">
           <Button
             size="lg"
             variant="default"
@@ -194,6 +189,24 @@ const ProblemAdditionPage = () => {
             onClick={handleAddProblem}
           >
             Add Problem
+          </Button>
+        </div> */}
+        <div className="flex justify-center md:col-span-2 mt-4">
+          <Button
+            size="lg"
+            variant="default"
+            disabled={adding}
+            onClick={!adding ? handleAddProblem : undefined}
+            className="w-full md:w-1/2 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {adding ? (
+              <>
+                <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4"></span>
+                Adding...
+              </>
+            ) : (
+              "Add Problem"
+            )}
           </Button>
         </div>
       </div>
