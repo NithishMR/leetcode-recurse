@@ -47,7 +47,7 @@ export default function UserActions({ data, onDelete }: UserActionsProps) {
             title="Edit"
             className="shrink-0 p-2 rounded-lg hover:bg-gray-100 transition cursor-pointer "
           >
-            <Image src="/Edit.svg" width={18} height={18} alt="Edit" />
+            <Image src="./Edit.svg" width={18} height={18} alt="Edit" />
           </button>
         </DialogTrigger>
 
@@ -188,7 +188,7 @@ export default function UserActions({ data, onDelete }: UserActionsProps) {
             title="Delete"
             className="shrink-0 cursor-pointer"
           >
-            <Image src="/Delete.svg" width={20} height={20} alt="Delete" />
+            <Image src="./Delete.svg" width={20} height={20} alt="Delete" />
           </button>
         </DialogTrigger>
 
