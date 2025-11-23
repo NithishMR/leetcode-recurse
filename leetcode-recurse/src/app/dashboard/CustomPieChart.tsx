@@ -107,7 +107,6 @@ export default function CustomPieChart({ data }: { data: any[] }) {
   return (
     <PieChart width={500} height={350}>
       <Pie
-        activeIndex={activeIndex}
         activeShape={renderActiveShape}
         data={data}
         cx="50%"
