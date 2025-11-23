@@ -11,7 +11,7 @@ interface IconProps extends React.SVGProps<SVGSVGElement> {
 }
 
 // ➕ Add Icon
-export const PlusIcon: React.FC<IconProps> = (props) => (
+const PlusIcon: React.FC<IconProps> = (props) => (
   <svg
     {...props}
     xmlns="http://www.w3.org/2000/svg"
@@ -29,7 +29,7 @@ export const PlusIcon: React.FC<IconProps> = (props) => (
 );
 
 // 🔁 Review Icon
-export const ClockIcon: React.FC<IconProps> = (props) => (
+const ClockIcon: React.FC<IconProps> = (props) => (
   <svg
     {...props}
     xmlns="http://www.w3.org/2000/svg"
@@ -47,7 +47,7 @@ export const ClockIcon: React.FC<IconProps> = (props) => (
 );
 
 // ✏️ Edit Icon
-export const PencilIcon: React.FC<IconProps> = (props) => (
+const PencilIcon: React.FC<IconProps> = (props) => (
   <svg
     {...props}
     xmlns="http://www.w3.org/2000/svg"
@@ -64,7 +64,7 @@ export const PencilIcon: React.FC<IconProps> = (props) => (
   </svg>
 );
 
-export const TrashIcon: React.FC<IconProps> = (props) => (
+const TrashIcon: React.FC<IconProps> = (props) => (
   <svg
     {...props}
     xmlns="http://www.w3.org/2000/svg"

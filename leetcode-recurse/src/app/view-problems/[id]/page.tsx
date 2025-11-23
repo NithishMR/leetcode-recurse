@@ -17,7 +17,7 @@ const formatDate = (dateStr: string | null | undefined) => {
 };
 
 // --- Icons ---
-export const CalendarIcon = (props: any) => (
+const CalendarIcon = (props: any) => (
   <svg
     {...props}
     viewBox="0 0 24 24"
@@ -33,7 +33,7 @@ export const CalendarIcon = (props: any) => (
   </svg>
 );
 
-export const ClockIcon = (props: any) => (
+const ClockIcon = (props: any) => (
   <svg
     {...props}
     viewBox="0 0 24 24"
@@ -48,7 +48,7 @@ export const ClockIcon = (props: any) => (
   </svg>
 );
 
-export const ReviewCountIcon = (props: any) => (
+const ReviewCountIcon = (props: any) => (
   <svg
     {...props}
     viewBox="0 0 24 24"

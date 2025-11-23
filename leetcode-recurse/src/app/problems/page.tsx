@@ -19,7 +19,7 @@ interface Problem {
 }
 
 // TextArea component
-export function TextArea({
+function TextArea({
   value,
   onChange,
 }: {
