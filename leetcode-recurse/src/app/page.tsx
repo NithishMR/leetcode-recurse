@@ -18,19 +18,19 @@ export default function Home() {
   return (
     <div className="relative min-h-screen w-full bg-zinc-50 dark:bg-black flex items-start justify-center py-12 mt-10">
       {/* Avatar + Account Popover */}
-      <div className="fixed bottom-3 right-4 z-50">
-        <Popover>
-          <PopoverTrigger>
-            <Avatar className="cursor-pointer shadow">
-              <AvatarImage
-                src={user?.image ?? "https://github.com/shadcn.png"}
-              />
-              <AvatarFallback>U</AvatarFallback>
-            </Avatar>
-          </PopoverTrigger>
+      {user && (
+        <div className="fixed bottom-3 right-4 z-50">
+          <Popover>
+            <PopoverTrigger>
+              <Avatar className="cursor-pointer shadow">
+                <AvatarImage
+                  src={user?.image ?? "https://github.com/shadcn.png"}
+                />
+                <AvatarFallback>U</AvatarFallback>
+              </Avatar>
+            </PopoverTrigger>
 
-          <PopoverContent className="w-52 p-3 space-y-3 rounded-xl shadow-lg border bg-white dark:bg-zinc-900">
-            {user ? (
+            <PopoverContent className="w-52 p-3 space-y-3 rounded-xl shadow-lg border bg-white dark:bg-zinc-900">
               <>
                 {/* USER INFO */}
                 <div className="text-sm text-gray-700 dark:text-gray-300 ">
@@ -59,17 +59,10 @@ export default function Home() {
                   </Button>
                 </div>
               </>
-            ) : (
-              <Button
-                className="w-full cursor-pointer"
-                onClick={() => signIn("google")}
-              >
-                Sign In with Google
-              </Button>
-            )}
-          </PopoverContent>
-        </Popover>
-      </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+      )}
 
       {/* Main */}
       <div className="w-full max-w-4xl px-6 space-y-16">

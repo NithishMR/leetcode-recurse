@@ -101,7 +101,11 @@ import DifficyltyDistribution from "./DifficultyDistribution";
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Dashboard() {
-  const { data, error, isLoading } = useSWR("/api/dashboard/summary", fetcher);
+  const { data, error, isLoading } = useSWR("/api/dashboard/summary", fetcher, {
+    dedupingInterval: 1000 * 60 * 5, // 5 mins cache
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
 
   if (isLoading) {
     return (

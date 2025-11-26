@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
+import { mutate } from "swr";
 
 // import Details from "../../../public/Details.svg";
 // // import Edit from "../../../public/Edit.svg";
@@ -115,6 +116,10 @@ export default function UserActions({ data, onDelete }: UserActionsProps) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(updatedProblem),
               });
+              mutate("/api/dashboard/summary");
+              mutate("/api/dashboard/weekly-progress");
+              mutate("/api/dashboard/upcoming-reviews");
+              mutate("/api/dashboard/recent-activity");
 
               // location.reload();
             }}

@@ -17,7 +17,12 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export default function UpcomingReviews() {
   const { data, error, isLoading } = useSWR(
     "/api/dashboard/upcoming-reviews",
-    fetcher
+    fetcher,
+    {
+      dedupingInterval: 1000 * 60 * 5, // 5 mins cache
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
   );
 
   if (isLoading)

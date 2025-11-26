@@ -114,7 +114,12 @@ export default function RecentActivityLog() {
   // const [loading, setLoading] = useState(true);
   const { data, error, isLoading } = useSWR(
     "/api/dashboard/all-recent-activity",
-    fetcher
+    fetcher,
+    {
+      dedupingInterval: 1000 * 60 * 5, // 5 mins cache
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
   );
   // useEffect(() => {
   //   const fetchLogs = async () => {

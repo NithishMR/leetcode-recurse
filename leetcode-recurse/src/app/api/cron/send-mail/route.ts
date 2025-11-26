@@ -16,19 +16,27 @@ export async function GET() {
     // const endOfDayUTC = new Date(
     //   Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)
     // );
-    const startOfDayUTC = new Date(now);
-    startOfDayUTC.setUTCHours(0, 0, 0, 0);
+    // const startOfDayUTC = new Date(now);
+    // startOfDayUTC.setUTCHours(0, 0, 0, 0);
 
-    const endOfDayUTC = new Date(now);
-    endOfDayUTC.setUTCHours(23, 59, 59, 999);
+    // const endOfDayUTC = new Date(now);
+    // endOfDayUTC.setUTCHours(23, 59, 59, 999);
+    const startOfDay = new Date(now);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(now);
+    endOfDay.setHours(23, 59, 59, 999);
 
     // logs
-    console.log("startOfDayUTC:", startOfDayUTC.toISOString());
-    console.log("endOfDayUTC:", endOfDayUTC.toISOString());
+    // console.log("startOfDayUTC:", startOfDayUTC.toISOString());
+    // console.log("endOfDayUTC:", endOfDayUTC.toISOString());
 
     // 1) Get all problems due today
+    // const problemsDueToday = await Problem.find({
+    //   nextReviewDate: { $gte: startOfDayUTC, $lt: endOfDayUTC },
+    // });
     const problemsDueToday = await Problem.find({
-      nextReviewDate: { $gte: startOfDayUTC, $lt: endOfDayUTC },
+      nextReviewDate: { $gte: startOfDay, $lt: endOfDay },
     });
 
     if (problemsDueToday.length === 0) {
@@ -37,7 +45,7 @@ export async function GET() {
 
     // 2) Exclude problems already mailed today
     const pendingForEmail = problemsDueToday.filter(
-      (p) => !p.lastEmailSentDate || p.lastEmailSentDate < startOfDayUTC
+      (p) => !p.lastEmailSentDate || p.lastEmailSentDate < startOfDay
     );
 
     if (pendingForEmail.length === 0) {

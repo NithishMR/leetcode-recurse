@@ -8,7 +8,12 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 export default function DifficultyDistribution() {
   const { data, error, isLoading } = useSWR(
     "/api/dashboard/difficulty-distribution",
-    fetcher
+    fetcher,
+    {
+      dedupingInterval: 1000 * 60 * 5, // 5 mins cache
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
   );
 
   if (isLoading)

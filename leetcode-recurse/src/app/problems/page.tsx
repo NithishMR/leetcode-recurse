@@ -8,6 +8,7 @@ import { CalendarPicker } from "./DateSolved";
 import { Button } from "@/components/ui/button";
 import { PlatformDropdown } from "./PlatformDropdown";
 import { toast } from "sonner";
+import { mutate } from "swr";
 interface Problem {
   _id?: string;
   problemName: string;
@@ -91,6 +92,10 @@ const ProblemAdditionPage = () => {
         setDateSolved(undefined);
 
         setAdding(false); // enable again
+        mutate("/api/dashboard/summary");
+        mutate("/api/dashboard/weekly-progress");
+        mutate("/api/dashboard/upcoming-reviews");
+        mutate("/api/dashboard/recent-activity");
 
         return saved;
       },

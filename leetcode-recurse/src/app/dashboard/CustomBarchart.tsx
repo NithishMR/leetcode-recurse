@@ -32,7 +32,12 @@ export default function CustomBarChart({
   // Fetch from backend API (replace with your route)
   const { data, error, isLoading } = useSWR(
     "/api/dashboard/weekly-progress",
-    fetcher
+    fetcher,
+    {
+      dedupingInterval: 1000 * 60 * 5, // 5 mins cache
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
   );
 
   if (isLoading)

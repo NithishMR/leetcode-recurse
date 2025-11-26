@@ -26,7 +26,7 @@ import FilterDropdown from "./FilterDropdown";
 import FilterIcon from "@/../../public/filter.svg";
 import ResetIcon from "@/../../public/reset.svg";
 import Image from "next/image";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 type ProblemDataStructure = {
   _id: string;
   problemName: string;
@@ -111,8 +111,12 @@ function ProblemsViewPage() {
 
         const result = await res.json();
         console.log("Problem deleted:", result);
+        mutate("/api/dashboard/summary");
+        mutate("/api/dashboard/weekly-progress");
+        mutate("/api/dashboard/upcoming-reviews");
+        mutate("/api/dashboard/recent-activity");
 
-        router.refresh(); // refresh UI
+        // router.refresh(); // refresh UI
         return result;
       },
       {
@@ -372,7 +376,7 @@ function ProblemsViewPage() {
                           <Link href={`view-problems/${datum._id}`}>
                             <div className="flex items-center gap-4">
                               <img
-                                src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${datum.source}.com&size=64`}
+                                src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${datum.source}&size=64`}
                                 alt="platform icon"
                                 width="25"
                                 height="25"
@@ -452,7 +456,7 @@ function ProblemsViewPage() {
                             <Link href={`view-problems/${datum._id}`}>
                               <div className="flex items-center gap-4">
                                 <img
-                                  src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${datum.source}.com&size=64`}
+                                  src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${datum.source}&size=64`}
                                   alt="platform icon"
                                   width="25"
                                   height="25"
