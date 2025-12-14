@@ -2,11 +2,13 @@ import Link from "next/link";
 
 export default function Documentation() {
   return (
-    <div className="min-h-screen bg-white text-gray-800 px-4 sm:px-6 py-12 mt-14">
+    <div className="min-h-screen bg-white dark:bg-black text-gray-800 dark:text-gray-200 px-4 sm:px-6 py-12 mt-14">
       {/* HEADER */}
       <header className="text-center mb-12 sm:mb-16">
-        <h1 className="text-3xl sm:text-4xl font-bold">📘 Documentation</h1>
-        <p className="text-base sm:text-lg text-gray-600 mt-2">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+          📘 Documentation
+        </h1>
+        <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 mt-2">
           Learn how to use the{" "}
           <b>
             <i>Anamnesis</i>
@@ -17,12 +19,12 @@ export default function Documentation() {
 
       {/* MAIN CONTENT */}
       <main className="space-y-14 sm:space-y-16 max-w-4xl mx-auto">
-        {/* SECTION — PURPOSE */}
+        {/* SECTION 1 */}
         <section>
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
             1. What is this app?
           </h2>
-          <article className="space-y-3 text-gray-700 leading-relaxed text-sm sm:text-base">
+          <article className="space-y-3 text-gray-700 dark:text-gray-300 leading-relaxed">
             <p>
               This application helps you track coding problems you solve on
               platforms like LeetCode, GFG, Codeforces, and more. It uses a{" "}
@@ -38,15 +40,15 @@ export default function Documentation() {
           </article>
         </section>
 
-        {/* SECTION — AUTHENTICATION */}
+        {/* SECTION 2 */}
         <section>
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
             2. Authentication
           </h2>
-          <article className="space-y-3 text-gray-700 leading-relaxed text-sm sm:text-base">
+          <article className="space-y-3 text-gray-700 dark:text-gray-300 leading-relaxed">
             <p>
               You can sign in using <b>Google OAuth</b>. No password required
-              and your data remains secure. Your account stores:
+              and your data remains secure.
             </p>
             <ul className="list-disc ml-6 sm:ml-8 space-y-1">
               <li>Email</li>
@@ -57,23 +59,21 @@ export default function Documentation() {
           </article>
         </section>
 
-        {/* SECTION — ADDING PROBLEMS */}
+        {/* SECTION 3 */}
         <section>
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
             3. Adding Problems
           </h2>
-          <article className="space-y-3 text-gray-700 leading-relaxed text-sm sm:text-base">
+          <article className="space-y-3 text-gray-700 dark:text-gray-300 leading-relaxed">
             <p>
-              Navigate to <code className="px-1 bg-gray-100">/problems</code> to
-              add a new problem.
-            </p>
-            <p>
-              I'm planning to make an extension that automatically stores the
-              problem detail when you solve a platform.
+              Navigate to{" "}
+              <code className="px-1 bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-gray-200 rounded">
+                /problems
+              </code>{" "}
+              to add a new problem.
             </p>
 
-            <p>Fields you must fill:</p>
-
+            <p>Fields to fill:</p>
             <ul className="list-disc ml-6 sm:ml-8 space-y-1">
               <li>Problem name</li>
               <li>Problem URL</li>
@@ -88,23 +88,25 @@ export default function Documentation() {
               <b>
                 <i>next review date</i>
               </b>{" "}
-              based on spaced repetition (7/14/30/60 days).
+              based on spaced repetition.
             </p>
           </article>
         </section>
 
-        {/* SECTION — VIEWING PROBLEMS */}
+        {/* SECTION 4 */}
         <section>
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
             4. Viewing Problems
           </h2>
-          <article className="space-y-3 text-gray-700 leading-relaxed text-sm sm:text-base">
+          <article className="space-y-3 text-gray-700 dark:text-gray-300 leading-relaxed">
             <p>
-              Visit <code className="px-1 bg-gray-100">/view-problems</code> to
-              see your entire list.
+              Visit{" "}
+              <code className="px-1 bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-gray-200 rounded">
+                /view-problems
+              </code>{" "}
+              to see your entire list.
             </p>
 
-            <p>Features include:</p>
             <ul className="list-disc ml-6 sm:ml-8 space-y-1">
               <li>Pagination</li>
               <li>Filtering</li>
@@ -115,13 +117,14 @@ export default function Documentation() {
           </article>
         </section>
 
-        {/* SECTION — REVIEW SYSTEM */}
+        {/* SECTION 5 */}
         <section>
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
             5. Review System
           </h2>
-          <article className="space-y-3 text-gray-700 leading-relaxed text-sm sm:text-base">
+          <article className="space-y-3 text-gray-700 dark:text-gray-300 leading-relaxed">
             <p>The app shows what you should review next:</p>
+
             <ul className="list-disc ml-6 sm:ml-8 space-y-1">
               <li>
                 <b>Upcoming Reviews</b> → next 7 days
@@ -144,16 +147,20 @@ export default function Documentation() {
           </article>
         </section>
 
-        {/* SECTION — DASHBOARD */}
+        {/* SECTION 6 */}
         <section>
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
             6. Dashboard
           </h2>
-          <article className="space-y-3 text-gray-700 leading-relaxed text-sm sm:text-base">
+          <article className="space-y-3 text-gray-700 dark:text-gray-300 leading-relaxed">
             <p>
-              Dashboard at <code className="px-1 bg-gray-100">/dashboard</code>{" "}
+              Dashboard at{" "}
+              <code className="px-1 bg-gray-100 dark:bg-zinc-800 text-gray-800 dark:text-gray-200 rounded">
+                /dashboard
+              </code>{" "}
               visualizes:
             </p>
+
             <ul className="list-disc ml-6 sm:ml-8 space-y-1">
               <li>Total problems</li>
               <li>Reviewed today</li>
@@ -166,18 +173,19 @@ export default function Documentation() {
           </article>
         </section>
 
-        {/* SECTION — CRONJOBS */}
+        {/* SECTION 7 */}
         <section>
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
             7. Daily Cron Jobs
           </h2>
-          <article className="space-y-3 text-gray-700 leading-relaxed text-sm sm:text-base">
+          <article className="space-y-3 text-gray-700 dark:text-gray-300 leading-relaxed">
             <p>
               A scheduled CronJob runs daily to check for due reviews and send
               reminder emails.
             </p>
             <p>
-              Cron runs at <b>00:00 (midnight)</b> every day using the sender:{" "}
+              Cron runs at <b>00:00 (midnight)</b> using sender:
+              <br />
               <b>
                 <i>anamnesis.tracker@gmail.com</i>
               </b>
@@ -185,10 +193,12 @@ export default function Documentation() {
           </article>
         </section>
 
-        {/* SECTION — FAQ */}
+        {/* SECTION 8 */}
         <section>
-          <h2 className="text-xl sm:text-2xl font-semibold mb-4">8. FAQs</h2>
-          <article className="space-y-4 text-gray-700 leading-relaxed text-sm sm:text-base">
+          <h2 className="text-xl sm:text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
+            8. FAQs
+          </h2>
+          <article className="space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed">
             <p>
               <b>Q:</b> Are my problems private?
               <br />
@@ -210,13 +220,13 @@ export default function Documentation() {
         </section>
 
         {/* FOOTER */}
-        <footer className="text-center text-gray-500 text-xs sm:text-sm mt-12">
+        <footer className="text-center text-gray-500 dark:text-gray-400 text-xs sm:text-sm mt-12">
           © {new Date().getFullYear()} Problem Review Tracker — Built with ❤️ &
           Next.js by{" "}
           <Link
             href="https://www.linkedin.com/in/nithishmr/?originalSubdomain=in"
             target="_blank"
-            className="hover:underline"
+            className="hover:underline text-blue-600 dark:text-blue-400"
           >
             NithishMR
           </Link>

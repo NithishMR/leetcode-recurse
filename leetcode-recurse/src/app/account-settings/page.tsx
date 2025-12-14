@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
@@ -8,13 +8,29 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { useSession } from "next-auth/react";
+import { useTheme } from "next-themes";
 
 export default function AccountSettings() {
   const { data: session } = useSession();
   const user = session?.user;
 
+  // THE FIX — use resolvedTheme instead of theme
+  const { resolvedTheme, setTheme } = useTheme();
+
   const [darkMode, setDarkMode] = useState(false);
   const [emailReminders, setEmailReminders] = useState(true);
+
+  // Sync toggle AFTER theme is loaded
+  useEffect(() => {
+    if (resolvedTheme) {
+      setDarkMode(resolvedTheme === "dark");
+    }
+  }, [resolvedTheme]);
+
+  const handleThemeChange = (checked: boolean) => {
+    setDarkMode(checked);
+    setTheme(checked ? "dark" : "light");
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-black flex items-start justify-center py-6 px-3 sm:py-12 sm:px-4 mt-14">
@@ -30,7 +46,6 @@ export default function AccountSettings() {
             Profile
           </h2>
 
-          {/* Avatar Row */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
             <Avatar className="h-20 w-20 shadow mx-auto sm:mx-0">
               <AvatarImage
@@ -83,6 +98,7 @@ export default function AccountSettings() {
             Preferences
           </h2>
 
+          {/* DARK MODE SWITCH */}
           <div className="flex justify-between items-center py-2">
             <Label htmlFor="theme" className="text-gray-700 dark:text-gray-300">
               Dark Mode
@@ -90,11 +106,11 @@ export default function AccountSettings() {
             <Switch
               id="theme"
               checked={darkMode}
-              onCheckedChange={setDarkMode}
-              disabled
+              onCheckedChange={handleThemeChange}
             />
           </div>
 
+          {/* EMAIL TOGGLE */}
           <div className="flex justify-between items-center py-2">
             <Label
               htmlFor="emailReminders"

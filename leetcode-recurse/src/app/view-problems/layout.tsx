@@ -11,11 +11,9 @@ interface RootLayoutProps {
 // Use the defined interface for the props and specify the return type as JSX.Element
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en">
-      <body>
-        {children}
-        <Toaster richColors position="top-right" />
-      </body>
-    </html>
+    <>
+      {children}
+      <Toaster richColors position="top-right" />
+    </>
   );
 }

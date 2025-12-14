@@ -208,38 +208,59 @@ function ProblemsViewPage() {
   // };
   if (isLoading)
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-50">
-        <p className="text-xl font-medium text-gray-700">Loading problem ...</p>
+      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-black">
+        <p className="text-xl font-medium text-gray-700 dark:text-white">
+          Loading problem ...
+        </p>
       </div>
     );
   if (error)
     return (
-      <div className="p-6 text-center text-red-500">
+      <div className="p-6 text-center text-red-500 dark:bg-black dark:text-red-400">
         Failed to load upcoming reviews.
       </div>
     );
   return (
-    <div className="mt-14">
+    <div className="mt-14 dark:bg-[#0d0d0d]">
       <div className="flex justify-center py-6">
-        <div className="w-full max-w-6xl bg-white p-6 rounded-xl shadow-sm">
+        <div className="w-full max-w-6xl bg-white p-6 rounded-xl shadow-sm  dark:bg-[#0d0d0d] dark:text-[#e5e5e5]">
           <div className="flex flex-row justify-around items-center relative">
-            <h1 className="font-bold text-2xl mb-12">LIST OF YOUR PROBLEMS</h1>
+            <h1 className="font-bold text-2xl mb-12 dark:text-[#e5e5e5]">
+              LIST OF YOUR PROBLEMS
+            </h1>
             <div className="inline top-0 right-20 ">
               <Popover>
                 <PopoverTrigger>
-                  <div className="flex flex-row justify-around items-center">
-                    <div className="px-4 py-2 border-2 border-gray-300 rounded-[10px] cursor-pointer">
+                  <div className="flex justify-around items-center">
+                    <div className="px-4 py-2 rounded-lg cursor-pointer border border-gray-300 bg-white text-gray-800 hover:bg-gray-100transition dark:bg-[#1f1f1f] dark:border-[#262626] dark:text-[#e5e5e5] dark:hover:bg-[#1b1b1b]">
                       Open Filter
                     </div>
                   </div>
                 </PopoverTrigger>
-                <PopoverContent>
-                  {/* LeetCode-style floating filter bar */}
-                  <div className="sticky top-0 bg-white z-20 border-b py-4 mb-6">
-                    <div className="flex flex-col gap-4 w-full max-w-6xl mx-auto px-2">
+
+                <PopoverContent
+                  className="
+      p-0
+      bg-white border border-gray-200
+      dark:bg-[#121212] dark:border-[#262626]
+    "
+                >
+                  {/* Floating filter bar */}
+                  <div
+                    className="
+        sticky top-0 z-20
+        border-b border-gray-200
+        py-4 mb-6
+
+        bg-white
+        dark:bg-[#121212]
+        dark:border-[#262626]
+      "
+                  >
+                    <div className="flex flex-col gap-4 w-full max-w-6xl mx-auto px-4">
                       {/* Difficulty */}
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-semibold text-gray-700">
+                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                           Difficulty:
                         </span>
                         <FilterDropdown
@@ -257,7 +278,7 @@ function ProblemsViewPage() {
 
                       {/* Source */}
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-semibold text-gray-700">
+                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                           Source:
                         </span>
                         <FilterDropdown
@@ -269,7 +290,7 @@ function ProblemsViewPage() {
                             { label: "LeetCode", value: "leetcode" },
                             { label: "GFG", value: "geeksforgeeks" },
                             { label: "Codeforces", value: "codeforces" },
-                            { label: "coderchef", value: "coderchef" },
+                            { label: "CodeChef", value: "coderchef" },
                             { label: "HackerRank", value: "hackerrank" },
                           ]}
                         />
@@ -277,7 +298,7 @@ function ProblemsViewPage() {
 
                       {/* Status */}
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-semibold text-gray-700">
+                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                           Status:
                         </span>
                         <FilterDropdown
@@ -296,7 +317,7 @@ function ProblemsViewPage() {
 
                       {/* Date */}
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-semibold text-gray-700">
+                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                           Date:
                         </span>
                         <FilterDropdown
@@ -313,9 +334,9 @@ function ProblemsViewPage() {
                       </div>
 
                       {/* Buttons */}
-                      <div className="flex justify-around items-center gap-3">
+                      <div className="flex justify-around items-center gap-3 pt-2 ">
                         <Button
-                          variant={"outline"}
+                          variant="outline"
                           onClick={() => {
                             setIsFilterOn(false);
                             setDifficultyFilter("any");
@@ -324,15 +345,30 @@ function ProblemsViewPage() {
                             setDateFilter("any");
                             router.refresh();
                           }}
-                          className="text-sm text-blue-600 cursor-pointer w-28"
+                          className="cursor-pointer w-28 text-sm
+              text-blue-600 border-blue-600
+              hover:bg-blue-50
+
+              dark:text-blue-400
+              dark:border-blue-500
+              dark:hover:bg-blue-900/20
+            "
                         >
                           Reset
                         </Button>
 
                         <Button
-                          variant={"outline"}
+                          variant="outline"
                           onClick={handleFilter}
-                          className="text-sm cursor-pointer  w-28"
+                          className="cursor-pointer 
+              w-28 text-sm
+              border-gray-300 text-gray-700
+              hover:bg-gray-100
+
+              dark:border-[#262626]
+              dark:text-gray-200
+              dark:hover:bg-[#1f1f1f]
+            "
                         >
                           Filter
                         </Button>
@@ -346,33 +382,49 @@ function ProblemsViewPage() {
 
           {isFilterOn == true ? (
             <div className="">
-              <Table className="text-sm">
+              <Table className="text-sm rounded-lg">
                 <TableCaption>
                   You have {data.totalPages} pages of problems.
                 </TableCaption>
 
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>PROBLEM</TableHead>
-                    <TableHead>DIFFICULTY</TableHead>
-                    <TableHead>DATE SOLVED</TableHead>
-                    <TableHead className="text-center">STATUS</TableHead>
+                <TableHeader className="">
+                  <TableRow className="dark:bg-[#1f1f1f]">
+                    <TableHead className="dark:text-gray-500">
+                      PROBLEM
+                    </TableHead>
+                    <TableHead className="dark:text-gray-500">
+                      DIFFICULTY
+                    </TableHead>
+                    <TableHead className="dark:text-gray-500">
+                      DATE SOLVED
+                    </TableHead>
+                    <TableHead className="text-center dark:text-gray-500">
+                      STATUS
+                    </TableHead>
                     {/* <TableHead>Times Reviewed</TableHead> */}
-                    <TableHead>ACTIONS</TableHead>
+                    <TableHead className="dark:text-gray-500">
+                      ACTIONS
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
 
                 <TableBody>
                   {data.problems.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-6">
+                      <TableCell
+                        colSpan={8}
+                        className="text-center py-6 dark:text-gray-500"
+                      >
                         No problems added yet.
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredData.map((datum, index) => (
-                      <TableRow key={index} className="hover:bg-gray-50">
-                        <TableCell className="font-medium">
+                      <TableRow
+                        key={index}
+                        className="hover:bg-gray-50 hover:text-black dark:hover:bg-[#1f1f1f] "
+                      >
+                        <TableCell className="font-medium dark:hover:text-blue-400">
                           <Link href={`view-problems/${datum._id}`}>
                             <div className="flex items-center gap-4">
                               <img
@@ -425,34 +477,50 @@ function ProblemsViewPage() {
             </div>
           ) : (
             <div className="">
-              <Table className="text-sm">
+              <Table className="text-sm dark:text-[#a3a3a3]">
                 <TableCaption>
                   You have {data.totalPages} pages of problems.
                 </TableCaption>
 
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>PROBLEM</TableHead>
-                    <TableHead>DIFFICULTY</TableHead>
-                    <TableHead>DATE SOLVED</TableHead>
-                    <TableHead className="text-center">STATUS</TableHead>
+                <TableHeader className="">
+                  <TableRow className="dark:bg-[#1f1f1f]">
+                    <TableHead className="dark:text-gray-500">
+                      PROBLEM
+                    </TableHead>
+                    <TableHead className="dark:text-gray-500">
+                      DIFFICULTY
+                    </TableHead>
+                    <TableHead className="dark:text-gray-500">
+                      DATE SOLVED
+                    </TableHead>
+                    <TableHead className="text-center dark:text-gray-500">
+                      STATUS
+                    </TableHead>
                     {/* <TableHead>Times Reviewed</TableHead> */}
-                    <TableHead>ACTIONS</TableHead>
+                    <TableHead className="dark:text-gray-500">
+                      ACTIONS
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
 
                 <TableBody>
                   {data.problems.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-6">
+                      <TableCell
+                        colSpan={8}
+                        className="text-center py-6 dark:text-gray-500"
+                      >
                         No problems added yet.
                       </TableCell>
                     </TableRow>
                   ) : (
                     data.problems.map(
                       (datum: ProblemDataStructure, index: number) => (
-                        <TableRow key={index} className="hover:bg-gray-50">
-                          <TableCell className="font-medium">
+                        <TableRow
+                          key={index}
+                          className="hover:bg-gray-50 dark:hover:bg-[#1f1f1f] "
+                        >
+                          <TableCell className="font-medium  dark:hover:text-blue-400">
                             <Link href={`view-problems/${datum._id}`}>
                               <div className="flex items-center gap-4">
                                 <img
@@ -512,12 +580,12 @@ function ProblemsViewPage() {
               onClick={() => setCurrentPage((prev) => prev - 1)}
               disabled={currentPage === 1}
               variant="outline"
-              className="px-4 py-2 cursor-pointer"
+              className="px-4 py-2 hover:cursor-pointer"
             >
               Previous
             </Button>
 
-            <span className="text-sm text-gray-700 bg-gray-100 px-3 py-1 rounded-md border">
+            <span className="text-sm text-gray-700 bg-gray-100 px-3 py-1 rounded-md border dark:bg-[#0d0d0d] dark:text-gray-400">
               Page <b>{currentPage}</b> of <b>{data.totalPages}</b>
             </span>
 

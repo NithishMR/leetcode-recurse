@@ -79,7 +79,7 @@ export default function UserActions({ data, onDelete }: UserActionsProps) {
           <button
             type="button"
             title="Edit"
-            className="shrink-0 p-2 rounded-lg hover:bg-gray-100 transition cursor-pointer "
+            className="shrink-0 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-[#161616] transition cursor-pointer "
           >
             {/* <Image src="./Edit.svg" width={18} height={18} alt="Edit" /> */}
             <EditIcon />
@@ -165,7 +165,12 @@ export default function UserActions({ data, onDelete }: UserActionsProps) {
               <DialogClose asChild>
                 <button
                   type="button"
-                  className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition cursor-pointer"
+                  className="
+    px-4 py-2 rounded-lg
+    bg-neutral-800 hover:bg-neutral-700
+    text-neutral-200
+    border border-neutral-700
+    transition cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -174,7 +179,8 @@ export default function UserActions({ data, onDelete }: UserActionsProps) {
                 <DialogClose asChild>
                   <button
                     type="submit"
-                    className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition cursor-pointer"
+                    className="px-4 py-2 rounded-lg      bg-green-600 hover:bg-green-700      text-white transition cursor-pointer
+    "
                   >
                     Save changes
                   </button>
@@ -225,7 +231,7 @@ export default function UserActions({ data, onDelete }: UserActionsProps) {
           <button
             type="button"
             title="Delete"
-            className="shrink-0 cursor-pointer"
+            className="shrink-0 p-2 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-[#161616]"
           >
             {/* <Image src="./Delete.svg" width={20} height={20} alt="Delete" /> */}
             <DeleteIcon />
@@ -233,20 +239,34 @@ export default function UserActions({ data, onDelete }: UserActionsProps) {
         </DialogTrigger>
 
         <DialogContent className="sm:max-w-md">
-          <DialogTitle className="text-xl font-semibold">
+          <DialogTitle className="text-xl font-semibold dark:text-[#a3a3a3]">
             Do you want to delete this problem?
           </DialogTitle>
 
           <DialogFooter className="flex justify-end gap-3 pt-4">
             <DialogClose asChild>
-              <button className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 transition cursor-pointer">
+              <button
+                className="
+    px-4 py-2 rounded-lg
+    bg-neutral-800 hover:bg-neutral-700
+    text-neutral-200
+    border border-neutral-700
+    transition cursor-pointer
+  "
+              >
                 Cancel
               </button>
             </DialogClose>
+
             <DialogClose asChild>
               <button
                 onClick={() => onDelete(data._id)}
-                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition cursor-pointer"
+                className="
+      px-4 py-2 rounded-lg
+      bg-red-600 hover:bg-red-700
+      text-white
+      transition cursor-pointer
+    "
               >
                 Delete
               </button>
