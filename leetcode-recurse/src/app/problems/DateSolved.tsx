@@ -28,7 +28,7 @@ export function CalendarPicker({ value, onChange }: CalendarPickerProps) {
 
   return (
     <Popover>
-      <PopoverTrigger asChild>
+      <PopoverTrigger asChild className="cursor-pointer ">
         <Button
           variant="outline"
           className={cn(

@@ -1,10 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-import DeleteIcon from "@/../../public/deleteIcon.svg";
 import Link from "next/link";
 import useSWR from "swr";
+
 // Common props interface for all icons
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   className?: string;
@@ -14,11 +13,10 @@ interface IconProps extends React.SVGProps<SVGSVGElement> {
 const PlusIcon: React.FC<IconProps> = (props) => (
   <svg
     {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
     viewBox="0 0 24 24"
-    strokeWidth={2}
+    fill="none"
     stroke="currentColor"
+    strokeWidth={2}
   >
     <path
       strokeLinecap="round"
@@ -32,11 +30,10 @@ const PlusIcon: React.FC<IconProps> = (props) => (
 const ClockIcon: React.FC<IconProps> = (props) => (
   <svg
     {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
     viewBox="0 0 24 24"
-    strokeWidth={2}
+    fill="none"
     stroke="currentColor"
+    strokeWidth={2}
   >
     <path
       strokeLinecap="round"
@@ -50,11 +47,10 @@ const ClockIcon: React.FC<IconProps> = (props) => (
 const PencilIcon: React.FC<IconProps> = (props) => (
   <svg
     {...props}
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
     viewBox="0 0 24 24"
-    strokeWidth={2}
+    fill="none"
     stroke="currentColor"
+    strokeWidth={2}
   >
     <path
       strokeLinecap="round"
@@ -64,10 +60,10 @@ const PencilIcon: React.FC<IconProps> = (props) => (
   </svg>
 );
 
+// 🗑️ Delete Icon
 const TrashIcon: React.FC<IconProps> = (props) => (
   <svg
     {...props}
-    xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
@@ -89,15 +85,13 @@ interface ActivityLog {
   timestamp: string;
 }
 
-// Simple “time ago” formatter
+// Time ago helper
 function timeAgo(dateStr: string) {
   const diff = (Date.now() - new Date(dateStr).getTime()) / 1000;
-
   if (diff < 60) return "just now";
   if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
   if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
   if (diff < 86400 * 7) return `${Math.floor(diff / 86400)} days ago`;
-
   return new Date(dateStr).toLocaleDateString();
 }
 
@@ -108,49 +102,45 @@ const icons: Record<string, React.FC<IconProps>> = {
   edit: PencilIcon,
   delete: TrashIcon,
 };
+
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 export default function RecentActivityLog() {
-  // const [logs, setLogs] = useState<ActivityLog[]>([]);
-  // const [loading, setLoading] = useState(true);
   const { data, error, isLoading } = useSWR(
     "/api/dashboard/recent-activity",
     fetcher,
     {
-      dedupingInterval: 1000 * 60 * 5, // 5 mins cache
+      dedupingInterval: 1000 * 60 * 5,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
     }
   );
-  // useEffect(() => {
-  //   const fetchLogs = async () => {
-  //     try {
-  //       const res = await fetch("/api/dashboard/recent-activity");
-  //       const data = await res.json();
-  //       setLogs(data);
-  //     } catch (error) {
-  //       console.error("Failed to fetch activity log", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
 
-  //   fetchLogs();
-  // }, []);
-
-  if (isLoading)
+  if (isLoading) {
     return (
-      <div className="bg-white p-6 rounded-xl shadow">
-        <p className="text-gray-500">Loading activity...</p>
+      <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200 dark:bg-[#161616] dark:border-[#262626] dark:shadow-none">
+        <p className="text-gray-500 dark:text-gray-400">Loading activity...</p>
       </div>
     );
+  }
+
   if (error) return <p className="text-red-500">Failed to load activity</p>;
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow border border-gray-100">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Activity</h2>
+    <div
+      className="
+        bg-white p-6 rounded-2xl border shadow-md
+        dark:bg-[#161616] dark:border-[#262626] dark:shadow-none
+      "
+    >
+      <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-[#e5e5e5]">
+        Recent Activity
+      </h2>
 
       {data.length === 0 ? (
-        <p className="text-gray-500 text-sm">No recent activity.</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          No recent activity.
+        </p>
       ) : (
         <ul className="space-y-4">
           {data.map((log: ActivityLog) => {
@@ -158,16 +148,19 @@ export default function RecentActivityLog() {
             return (
               <li
                 key={log._id}
-                className="flex items-start gap-3 border-b pb-3 last:border-none"
+                className="
+                  flex items-start gap-3
+                  border-b border-gray-200 pb-3 last:border-none
+
+                  dark:border-[#262626]
+                "
               >
-                {/* Render SVG Component */}
-                <span className="w-6 h-6 text-gray-700">
+                <span className="w-6 h-6 text-gray-700 dark:text-gray-300">
                   <Icon className="w-6 h-6" />
                 </span>
 
                 <div className="flex flex-col">
-                  {/* Activity Line */}
-                  <p className="text-gray-800">
+                  <p className="text-gray-800 dark:text-gray-200">
                     {log.type === "add" && (
                       <>
                         Added <b>{log.problemName}</b>
@@ -190,8 +183,7 @@ export default function RecentActivityLog() {
                     )}
                   </p>
 
-                  {/* Timestamp */}
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     {timeAgo(log.timestamp)}
                   </span>
                 </div>
@@ -201,9 +193,14 @@ export default function RecentActivityLog() {
         </ul>
       )}
 
-      <div className="flex justify-center items-center">
-        <Link href="dashboard/recent-activity">
-          <Button variant={"link"}>See all the recent activity</Button>
+      <div className="flex justify-center mt-4">
+        <Link href="/dashboard/recent-activity">
+          <Button
+            variant="link"
+            className="text-blue-600 dark:text-blue-400 cursor-pointer"
+          >
+            See all recent activity
+          </Button>
         </Link>
       </div>
     </div>

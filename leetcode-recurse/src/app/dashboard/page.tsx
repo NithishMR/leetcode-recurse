@@ -109,8 +109,8 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-50">
-        <p className="text-xl font-medium text-gray-700">
+      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-[#161616]">
+        <p className="text-xl font-medium text-gray-700 dark:text-gray-400">
           Loading dashboard ...
         </p>
       </div>
@@ -140,28 +140,68 @@ export default function Dashboard() {
         <AnalyticsCard titleHeader="Review Overdue" count={overdue} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
-        <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-200">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12 ">
+        <div
+          className="bg-white rounded-2xl shadow-md p-6 border border-gray-200
+        hover:shadow-lg
+        hover:bg-gray-50
+        dark:bg-[#161616]
+        dark:border-[#262626]
+        dark:shadow-none
+        dark:hover:bg-[#1f1f1f]"
+        >
           <h2 className="text-lg font-semibold mb-4">
             Difficulty Distribution
           </h2>
           <DifficyltyDistribution />
         </div>
 
-        <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-200">
+        <div
+          className="rounded-2xl  p-6 border 
+        shadow-md
+        hover:shadow-lg
+        hover:bg-gray-50
+
+        dark:bg-[#161616]
+        dark:border-[#262626]
+        dark:shadow-none
+        dark:hover:bg-[#1f1f1f]"
+        >
           <h2 className="text-lg font-semibold mb-4">Progress Over Time</h2>
           <ProgressOverTime />
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
-        <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-4">Upcoming Reviews</h2>
+        <div
+          className=" rounded-2xl  p-6 border bg-white
+        border-gray-200
+        shadow-md
+        hover:shadow-lg
+        hover:bg-gray-50
+
+        dark:bg-[#161616]
+        dark:border-[#262626]
+        dark:shadow-none
+        dark:hover:bg-[#1f1f1f]"
+        >
+          {/* <h2 className="text-lg font-semibold mb-4">Upcoming Reviews</h2> */}
           <UpcomingReviews />
         </div>
 
-        <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-200">
-          <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
+        <div
+          className=" rounded-2xl  p-6 border bg-white
+        border-gray-200
+        shadow-md
+        hover:shadow-lg
+        hover:bg-gray-50
+
+        dark:bg-[#161616]
+        dark:border-[#262626]
+        dark:shadow-none
+        dark:hover:bg-[#1f1f1f]"
+        >
+          {/* <h2 className="text-lg font-semibold mb-4">Recent Activity</h2> */}
           <RecentActivityLog />
         </div>
       </div>

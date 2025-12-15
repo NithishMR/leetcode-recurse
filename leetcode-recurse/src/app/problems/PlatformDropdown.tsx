@@ -11,9 +11,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Image from "next/image";
 
-interface DifficultyDropdownProps {
+interface PlatformDropdownProps {
   value: string;
   onChange: (value: string) => void;
 }
@@ -41,23 +40,61 @@ const PLATFORMS = [
   },
 ];
 
-export function PlatformDropdown({ value, onChange }: DifficultyDropdownProps) {
+export function PlatformDropdown({ value, onChange }: PlatformDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline">
-          {value ? value : "Select Your Platform"}
+        <Button
+          variant="outline"
+          className="
+            dark:bg-[#121212]
+            dark:text-[#e5e5e5]
+            dark:border-[#262626]
+            dark:hover:bg-[#1f1f1f] cursor-pointer
+          "
+        >
+          {value || "Select Your Platform"}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>Select your platform</DropdownMenuLabel>
-        <DropdownMenuSeparator />
+
+      <DropdownMenuContent
+        className="
+          w-56
+          bg-white border border-gray-200
+          dark:bg-[#161616] dark:border-[#262626]
+        "
+      >
+        <DropdownMenuLabel
+          className="
+            text-gray-700
+            dark:text-[#cbd5e1]
+          "
+        >
+          Select your platform
+        </DropdownMenuLabel>
+
+        <DropdownMenuSeparator className="dark:bg-[#262626]" />
+
         <DropdownMenuRadioGroup value={value} onValueChange={onChange}>
           {PLATFORMS.map((p) => (
-            <DropdownMenuRadioItem key={p.key} value={p.key}>
+            <DropdownMenuRadioItem
+              key={p.key}
+              value={p.key}
+              className="
+                text-gray-700
+                hover:bg-gray-100
+
+                dark:text-[#e5e5e5]
+                dark:hover:bg-[#1f1f1f] cursor-pointer
+              "
+            >
               <div className="flex items-center gap-2">
-                <img src={p.icon} alt="platformm icon" className="w-4 h-4" />
-                {p.name}
+                <img
+                  src={p.icon}
+                  alt={`${p.name} icon`}
+                  className="w-4 h-4 rounded-sm"
+                />
+                <span>{p.name}</span>
               </div>
             </DropdownMenuRadioItem>
           ))}

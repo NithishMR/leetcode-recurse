@@ -19,42 +19,52 @@ export default function UpcomingReviews() {
     "/api/dashboard/upcoming-reviews",
     fetcher,
     {
-      dedupingInterval: 1000 * 60 * 5, // 5 mins cache
+      dedupingInterval: 1000 * 60 * 5,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
     }
   );
 
-  if (isLoading)
+  if (isLoading) {
     return (
-      <div className="p-6 text-center text-gray-500">
+      <div className="p-6 text-center text-gray-500 dark:text-gray-400">
         Loading upcoming reviews...
       </div>
     );
+  }
 
-  if (error)
+  if (error) {
     return (
       <div className="p-6 text-center text-red-500">
         Failed to load upcoming reviews.
       </div>
     );
+  }
 
   const upcoming: ProblemSchema[] = data?.reviews ?? [];
 
-  if (upcoming.length === 0)
+  if (upcoming.length === 0) {
     return (
-      <div className="p-6 text-center text-gray-400 italic">
+      <div className="p-6 text-center italic text-gray-400 dark:text-gray-500">
         No reviews scheduled in the next 7 days 🎉
       </div>
     );
+  }
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
-      <h2 className="text-xl font-semibold mb-4 text-gray-800">
+    <div
+      className="
+        bg-white p-6 rounded-2xl border shadow-md
+        dark:bg-[#161616]
+        dark:border-[#262626]
+        dark:shadow-none
+      "
+    >
+      <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-[#e5e5e5]">
         Upcoming Reviews (Next 7 Days)
       </h2>
 
-      <div className="divide-y divide-gray-200">
+      <div className="divide-y divide-gray-200 dark:divide-[#262626]">
         {upcoming.map((problem) => {
           const daysLeft = Math.ceil(
             (new Date(problem.nextReviewDate).getTime() - Date.now()) /
@@ -62,35 +72,46 @@ export default function UpcomingReviews() {
           );
 
           const getColor = () => {
-            if (daysLeft <= 2) return "text-green-600";
-            if (daysLeft <= 5) return "text-yellow-600";
-            return "text-red-600";
+            if (daysLeft <= 2) return "text-green-600 dark:text-green-400";
+            if (daysLeft <= 5) return "text-yellow-600 dark:text-yellow-400";
+            return "text-red-600 dark:text-red-400";
           };
 
           return (
             <Link key={problem._id} href={`/view-problems/${problem._id}`}>
-              <div className="flex justify-between items-center py-3 hover:bg-gray-50 transition-all px-2 rounded-lg">
+              <div
+                className="
+                  flex justify-between items-center
+                  py-3 px-2 rounded-lg
+                  transition-all
+
+                  hover:bg-gray-50
+                  dark:hover:bg-[#1f1f1f]
+                "
+              >
+                {/* LEFT */}
                 <div className="flex flex-col">
-                  <span className="font-medium text-gray-900">
+                  <span className="font-medium text-gray-900 dark:text-[#e5e5e5]">
                     {problem.problemName}
                   </span>
-                  <span className="text-sm text-gray-500 capitalize">
-                    {problem.source} •
+
+                  <span className="text-sm text-gray-500 dark:text-gray-400 capitalize">
+                    {problem.source} •{" "}
                     <span
                       className={
                         problem.difficulty === "easy"
-                          ? "text-green-700"
+                          ? "text-green-700 dark:text-green-400"
                           : problem.difficulty === "medium"
-                          ? "text-yellow-700"
-                          : "text-red-700"
+                          ? "text-yellow-700 dark:text-yellow-400"
+                          : "text-red-700 dark:text-red-400"
                       }
                     >
-                      {" "}
                       {problem.difficulty}
                     </span>
                   </span>
                 </div>
 
+                {/* RIGHT */}
                 <div className="text-right">
                   <p className={`font-semibold ${getColor()}`}>
                     {daysLeft === 0
@@ -99,7 +120,8 @@ export default function UpcomingReviews() {
                       ? "1 day left"
                       : `${daysLeft} days left`}
                   </p>
-                  <p className="text-xs text-gray-400">
+
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
                     {new Date(problem.nextReviewDate).toLocaleDateString(
                       "en-US",
                       {
@@ -115,9 +137,14 @@ export default function UpcomingReviews() {
         })}
       </div>
 
-      <div className="flex justify-center items-center">
-        <Link href={"/dashboard/upcoming-reviews"}>
-          <Button variant={"link"}>See all the Upcoming problems</Button>
+      <div className="flex justify-center mt-4">
+        <Link href="/dashboard/upcoming-reviews">
+          <Button
+            variant="link"
+            className="text-blue-600 dark:text-blue-400 cursor-pointer"
+          >
+            See all upcoming problems
+          </Button>
         </Link>
       </div>
     </div>

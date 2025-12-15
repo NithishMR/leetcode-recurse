@@ -107,6 +107,7 @@ export default function AccountSettings() {
               id="theme"
               checked={darkMode}
               onCheckedChange={handleThemeChange}
+              className="cursor-pointer"
             />
           </div>
 

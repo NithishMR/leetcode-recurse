@@ -24,7 +24,7 @@ const CalendarIcon = (props: any) => (
     fill="none"
     stroke="currentColor"
     strokeWidth={1.7}
-    className="w-6 h-6"
+    className="w-6 h-6 text-gray-600 dark:text-gray-300"
   >
     <rect x="3" y="4" width="18" height="18" rx="3" />
     <line x1="3" y1="10" x2="21" y2="10" />
@@ -40,7 +40,7 @@ const ClockIcon = (props: any) => (
     fill="none"
     stroke="currentColor"
     strokeWidth={1.7}
-    className="w-6 h-6"
+    className="w-6 h-6 text-gray-600 dark:text-gray-300"
   >
     <circle cx="12" cy="12" r="9" />
     <line x1="12" y1="7" x2="12" y2="12" />
@@ -55,7 +55,7 @@ const ReviewCountIcon = (props: any) => (
     fill="none"
     stroke="currentColor"
     strokeWidth={1.7}
-    className="w-6 h-6"
+    className="w-6 h-6 text-gray-600 dark:text-gray-300"
   >
     <path d="M3 12a9 9 0 1 1 9 9" strokeLinecap="round" />
     <polyline points="3 12 3 18 9 18" strokeLinecap="round" />
@@ -89,62 +89,53 @@ export default function ProblemDetails() {
     load();
   }, [id]);
 
-  if (loading)
+  if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <p className="text-xl text-gray-600">Loading…</p>
+      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-[#0d0d0d]">
+        <p className="text-xl text-gray-600 dark:text-gray-300">Loading…</p>
       </div>
     );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 mt-10">
+    <div className="min-h-screen py-12 mt-10 bg-gray-50 dark:bg-[#0d0d0d]">
       <div className="max-w-4xl mx-auto space-y-10 px-4">
         {/* HEADER */}
-        <div className="bg-white p-8 shadow-lg rounded-2xl border flex justify-between items-center">
+        <div
+          className="
+            bg-white p-8 rounded-2xl border shadow-lg
+            flex justify-between items-center
+
+            dark:bg-[#161616]
+            dark:border-[#262626]
+            dark:shadow-none
+          "
+        >
           <div>
-            <h1 className="text-4xl font-extrabold text-gray-900">
+            <h1 className="text-4xl font-extrabold text-gray-900 dark:text-[#e5e5e5]">
               {problem.problemName}
             </h1>
 
-            <div className="mt-4 flex items-center gap-2 text-gray-600">
+            <div className="mt-4 flex items-center gap-2 text-gray-600 dark:text-gray-300">
               <img
-                title=""
-                alt=""
-                src={`https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&url=http://${problem.source}.com&size=32`}
+                src={`https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&url=http://${problem.source}&size=32`}
                 className="rounded-md"
+                alt=""
               />
               <span className="font-medium">{problem.source}</span>
             </div>
           </div>
-          {/* {problem.status === "completed" && (
-            <Button
-              variant="default"
-              className="px-5 py-3 text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
-              disabled
-            >
-              Problem expired →
-            </Button>
-          )}
 
           {problem.status !== "completed" && (
             <Button
-              variant="default"
-              className="px-5 py-3 text-white bg-blue-600 hover:bg-blue-700 cursor-pointer"
-              onClick={handleReviewed}
-            >
-              Solve the Problem →
-            </Button>
-          )} */}
-          {/* third button */}
-          {problem.status !== "completed" && (
-            <Button
-              variant="default"
               disabled={clicked}
-              className={
-                "px-5 py-3 text-white bg-blue-600 hover:bg-blue-700 cursor-pointer " +
-                (clicked ? "opacity-50 cursor-not-allowed" : "")
-              }
               onClick={!clicked ? handleReviewed : undefined}
+              className="
+                px-5 py-3
+                bg-blue-600 hover:bg-blue-700
+                text-white
+                disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer
+              "
             >
               {clicked ? "Already clicked →" : "Solve the Problem →"}
             </Button>
@@ -171,9 +162,18 @@ export default function ProblemDetails() {
         </div>
 
         {/* NOTES */}
-        <div className="bg-white p-8 shadow-md rounded-2xl border">
-          <h2 className="text-2xl font-bold mb-4">Notes & Observations</h2>
-          <p className="text-gray-700 whitespace-pre-line">
+        <div
+          className="
+            bg-white p-8 rounded-2xl border shadow-md
+            dark:bg-[#161616]
+            dark:border-[#262626]
+            dark:shadow-none
+          "
+        >
+          <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-[#e5e5e5]">
+            Notes & Observations
+          </h2>
+          <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
             {problem.notes || "No notes yet."}
           </p>
         </div>
@@ -184,11 +184,25 @@ export default function ProblemDetails() {
 
 function StatCard({ icon: Icon, label, value }: any) {
   return (
-    <div className="bg-white p-6 shadow-md rounded-xl border hover:shadow-xl transition">
+    <div
+      className="
+        bg-white p-6 rounded-xl border shadow-md transition
+        hover:shadow-xl
+
+        dark:bg-[#161616]
+        dark:border-[#262626]
+        dark:shadow-none
+        dark:hover:bg-[#1f1f1f]
+      "
+    >
       <div className="flex flex-col items-center gap-2">
         <Icon />
-        <p className="text-sm text-gray-500 uppercase tracking-wide">{label}</p>
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
+        <p className="text-sm uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          {label}
+        </p>
+        <p className="text-2xl font-bold text-gray-900 dark:text-[#e5e5e5]">
+          {value}
+        </p>
       </div>
     </div>
   );
