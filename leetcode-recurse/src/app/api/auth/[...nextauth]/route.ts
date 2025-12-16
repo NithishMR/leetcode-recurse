@@ -4,6 +4,7 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { connectDB } from "@/database/connection";
 import User from "@/database/User";
+import { sendWelcomeMailToNewUser } from "@/utils/newUserMail";
 
 const handler = NextAuth({
   providers: [
@@ -20,7 +21,7 @@ const handler = NextAuth({
   callbacks: {
     async signIn({ user }) {
       //  Ensure DB is connected
-      console.log("user full info retrieved: ", user);
+      //console.log("user full info retrieved: ", user);
       await connectDB();
 
       //  Look for user in MongoDB
@@ -33,10 +34,14 @@ const handler = NextAuth({
           email: user.email,
           image: user.image,
         });
+        sendWelcomeMailToNewUser({
+          to: existingUser.email,
+          username: existingUser.name,
+        }).catch((err) => console.error("Welcome mail failed:", err));
 
-        console.log(" New user created:", existingUser._id);
+        console.log("Auth sign-in:", user.email);
       } else {
-        console.log("✔Existing user:", existingUser._id);
+        console.log("✔Existing user:");
       }
 
       // 4 Attach DB id to user object for JWT callback

@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 
 interface ProblemItem {
+  _id: any;
   problemName: string;
   problemUrl: string;
   difficulty: string;
@@ -23,7 +24,7 @@ const buildProblemListHTML = (problems: ProblemItem[]) => {
       return `
       <tr style="border-bottom:1px solid #e5e7eb;">
         <td style="padding: 12px 16px; font-size:15px; background:#ffffff;">
-          <a href="${p.problemUrl}"
+          <a href="https://anamnesis-beta.vercel.app/view-problems/${p._id}"
              style="color:#2563EB; font-weight:600; text-decoration:none;"
              target="_blank">
             ${p.problemName}

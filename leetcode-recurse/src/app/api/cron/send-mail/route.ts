@@ -80,16 +80,21 @@ export async function GET() {
     for (const [uid, userProblems] of problemsByUser.entries()) {
       const user = userEmailMap.get(uid);
       if (!user?.email) continue;
-
-      await sendEmailSummary({
-        to: user.email,
-        problems: userProblems.map((p: any) => ({
-          problemName: p.problemName,
-          problemUrl: p.problemUrl,
-          difficulty: p.difficulty,
-          source: p.source,
-        })),
-      });
+      try {
+        await sendEmailSummary({
+          to: user.email,
+          problems: userProblems.map((p: any) => ({
+            _id: p._id,
+            problemName: p.problemName,
+            problemUrl: p.problemUrl,
+            difficulty: p.difficulty,
+            source: p.source,
+          })),
+        });
+      } catch (e) {
+        console.error("Email failed for user:", user.email, e);
+        continue;
+      }
 
       // Update each problem's email timestamp
       await Problem.updateMany(
