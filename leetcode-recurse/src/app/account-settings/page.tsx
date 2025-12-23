@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 
 export default function AccountSettings() {
@@ -31,7 +31,9 @@ export default function AccountSettings() {
     setDarkMode(checked);
     setTheme(checked ? "dark" : "light");
   };
-
+  const handleLogOut = () => {
+    signOut();
+  };
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-black flex items-start justify-center py-6 px-3 sm:py-12 sm:px-4 mt-14">
       <div className="w-full max-w-3xl bg-white dark:bg-zinc-900 rounded-xl sm:rounded-2xl shadow-lg p-6 sm:p-10 space-y-10 border border-gray-200 dark:border-zinc-800">
@@ -137,8 +139,21 @@ export default function AccountSettings() {
           </h2>
 
           <div className="flex flex-col gap-4">
-            <Button variant="destructive" className="w-full sm:flex-1" disabled>
+            <Button
+              variant="destructive"
+              className="w-full sm:flex-1 cursor-pointer"
+              disabled
+            >
               Delete Account
+            </Button>
+          </div>
+          <div className="flex flex-col gap-4">
+            <Button
+              variant="destructive"
+              className="w-full sm:flex-1 cursor-pointer"
+              onClick={handleLogOut}
+            >
+              Log out
             </Button>
           </div>
         </section>
