@@ -98,6 +98,6 @@ export async function POST(
 
 // Spaced repetition intervals
 function getSpacing(times: number) {
-  const schedule = [7, 14, 30, 60];
+  const schedule = [7, 15, 31, 60];
   return schedule[Math.min(times - 1, schedule.length - 1)];
 }

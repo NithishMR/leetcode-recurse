@@ -46,9 +46,6 @@ export default function ProblemAdditionPage() {
       source,
       notes,
       dateSolved: dateSolved.toISOString(),
-      nextReviewDate: new Date(
-        dateSolved.getTime() + 7 * 24 * 60 * 60 * 1000
-      ).toISOString(),
     };
 
     setAdding(true);

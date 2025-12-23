@@ -6,50 +6,61 @@ import { getToken } from "next-auth/jwt";
 
 export async function POST(req: NextRequest) {
   try {
-    // Get authenticated user
+    // 1. AUTH
     const token: any = await getToken({
       req,
       secret: process.env.NEXTAUTH_SECRET,
     });
-    if (!token || !token.user || !token.user.id) {
+
+    if (!token?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await connectDB();
     const userId = token.user.id;
 
-    // Read body
+    // 2. READ BODY (dateSolved should be date-only string or ISO)
     const body = await req.json();
-    const {
-      problemName,
-      problemUrl,
-      source,
-      difficulty,
-      dateSolved,
-      notes,
-      nextReviewDate,
-    } = body;
+    const { problemName, problemUrl, source, difficulty, dateSolved, notes } =
+      body;
 
-    // Create the problem
+    if (!dateSolved) {
+      return NextResponse.json(
+        { error: "dateSolved is required" },
+        { status: 400 }
+      );
+    }
+
+    const solvedDateUTC = toUTCMidnight(new Date(dateSolved));
+
+    // 4. INITIAL SPACED REPETITION (FIRST REVIEW = +7 DAYS) and adding 1 as patch work fix 😂
+    const nextReviewDate = new Date(solvedDateUTC);
+    nextReviewDate.setUTCDate(nextReviewDate.getUTCDate() + 8);
+
+    // 5. CREATE PROBLEM
     const problem = await Problem.create({
-      userId, // <-- important!
+      userId,
       problemName,
       problemUrl,
       difficulty: difficulty.toLowerCase(),
       source,
       notes,
-      dateSolved,
+      dateSolved: solvedDateUTC,
       nextReviewDate,
+      timesSolved: 1,
+      status: "active",
     });
 
+    // 6. ACTIVITY LOG
     await ActivityLog.create({
       userId,
       type: "add",
       problemId: problem._id,
       problemName: problem.problemName,
     });
-    const logsCount = await ActivityLog.countDocuments({ userId });
 
+    // 7. TRIM LOGS (KEEP LAST 20)
+    const logsCount = await ActivityLog.countDocuments({ userId });
     if (logsCount > 20) {
       const deleteCount = logsCount - 20;
 
@@ -57,9 +68,9 @@ export async function POST(req: NextRequest) {
         .sort({ createdAt: 1 })
         .limit(deleteCount);
 
-      const idsToDelete = oldestLogs.map((l) => l._id);
-
-      await ActivityLog.deleteMany({ _id: { $in: idsToDelete } });
+      await ActivityLog.deleteMany({
+        _id: { $in: oldestLogs.map((l) => l._id) },
+      });
     }
 
     return NextResponse.json(problem, { status: 201 });
@@ -178,4 +189,12 @@ export async function DELETE(req: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+//helper for next review date
+// 3. NORMALIZE TO UTC MIDNIGHT
+function toUTCMidnight(date: Date) {
+  return new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+  );
 }
