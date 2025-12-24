@@ -31,11 +31,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const solvedDateUTC = toUTCMidnight(new Date(dateSolved));
-
-    // 4. INITIAL SPACED REPETITION (FIRST REVIEW = +7 DAYS) and adding 1 as patch work fix 😂
-    const nextReviewDate = new Date(solvedDateUTC);
-    nextReviewDate.setUTCDate(nextReviewDate.getUTCDate() + 8);
+    // const solvedDateUTC = toUTCMidnight(new Date(dateSolved));
+    const solvedDateToday = new Date(dateSolved);
+    solvedDateToday.setUTCDate(solvedDateToday.getUTCDate());
+    // 4. INITIAL SPACED REPETITION (FIRST REVIEW = +7 DAYS)
+    const nextReviewDate = new Date(solvedDateToday);
+    nextReviewDate.setUTCDate(nextReviewDate.getUTCDate() + 7);
 
     // 5. CREATE PROBLEM
     const problem = await Problem.create({
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
       difficulty: difficulty.toLowerCase(),
       source,
       notes,
-      dateSolved: solvedDateUTC,
+      dateSolved: solvedDateToday,
       nextReviewDate,
       timesSolved: 1,
       status: "active",
