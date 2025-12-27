@@ -14,7 +14,14 @@ export default function Dashboard() {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
-
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-black">
+        <p className="text-xl font-medium text-gray-700 dark:text-white">
+          Loading problem ...
+        </p>
+      </div>
+    );
   if (error) {
     return (
       <p className="text-center mt-10 text-red-500">
