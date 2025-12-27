@@ -6,9 +6,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import Image from "next/image";
+import ThemeSetter from "./ThemeSetter";
 export default function LandingPage() {
   return (
     <main className="w-full bg-background text-foreground">
+      <section className="absolute right-12 top-6">
+        <ThemeSetter />
+      </section>
       {/* ================= HERO ================= */}
       <section className="max-w-7xl mx-auto px-6  pt-28 pb-24">
         <div className="grid gap-16 md:grid-cols-2 items-center">
@@ -242,14 +246,20 @@ export default function LandingPage() {
           <p>Anamnesis © 2025</p>
 
           <div className="flex gap-6">
-            <Link href="#" className="hover:text-foreground">
+            <Link
+              href="https://github.com/NithishMR"
+              className="hover:text-foreground"
+            >
               GitHub
             </Link>
             <Link href="#" className="hover:text-foreground">
               Privacy
             </Link>
-            <Link href="#" className="hover:text-foreground">
-              Contact
+            <Link
+              href="https://google-inspired-portfolio.pages.dev/"
+              className="hover:text-foreground"
+            >
+              About the developer
             </Link>
           </div>
         </div>
