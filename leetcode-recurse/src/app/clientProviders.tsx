@@ -10,7 +10,7 @@ export default function ClientProviders({
 }) {
   return (
     <SessionProvider refetchInterval={0} refetchOnWindowFocus={false}>
-      <Navbar />
+      {/* <Navbar /> */}
       {children}
     </SessionProvider>
   );
