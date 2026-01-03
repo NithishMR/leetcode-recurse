@@ -10,42 +10,28 @@ export async function GET() {
     await connectDB();
 
     const now = new Date();
-    // const startOfDayUTC = new Date(
-    //   Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
-    // );
-    // const endOfDayUTC = new Date(
-    //   Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)
-    // );
-    // const startOfDayUTC = new Date(now);
-    // startOfDayUTC.setUTCHours(0, 0, 0, 0);
 
-    // const endOfDayUTC = new Date(now);
-    // endOfDayUTC.setUTCHours(23, 59, 59, 999);
-    const startOfDay = new Date(now);
-    startOfDay.setHours(0, 0, 0, 0);
+    // ✅ UTC day boundaries (CRITICAL FIX)
+    const startOfDayUTC = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 1)
+    );
 
-    const endOfDay = new Date(now);
-    endOfDay.setHours(23, 59, 59, 999);
+    const endOfDayUTC = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)
+    );
 
-    // logs
-    // console.log("startOfDayUTC:", startOfDayUTC.toISOString());
-    // console.log("endOfDayUTC:", endOfDayUTC.toISOString());
-
-    // 1) Get all problems due today
-    // const problemsDueToday = await Problem.find({
-    //   nextReviewDate: { $gte: startOfDayUTC, $lt: endOfDayUTC },
-    // });
+    // 1️⃣ Get problems due today (UTC-safe)
     const problemsDueToday = await Problem.find({
-      nextReviewDate: { $gte: startOfDay, $lt: endOfDay },
+      nextReviewDate: { $gte: startOfDayUTC, $lt: endOfDayUTC },
     });
-
+    console.log(problemsDueToday);
     if (problemsDueToday.length === 0) {
       return NextResponse.json({ message: "No problems due today" });
     }
 
-    // 2) Exclude problems already mailed today
+    // 2️⃣ Exclude problems already emailed today
     const pendingForEmail = problemsDueToday.filter(
-      (p) => !p.lastEmailSentDate || p.lastEmailSentDate < startOfDay
+      (p) => !p.lastEmailSentDate || p.lastEmailSentDate < startOfDayUTC
     );
 
     if (pendingForEmail.length === 0) {
@@ -54,7 +40,7 @@ export async function GET() {
       });
     }
 
-    // 3) Group by user
+    // 3️⃣ Group by user
     const problemsByUser = pendingForEmail.reduce((map, p) => {
       const uid = (p.userId as mongoose.Types.ObjectId).toString();
       if (!map.has(uid)) map.set(uid, []);
@@ -62,7 +48,7 @@ export async function GET() {
       return map;
     }, new Map<string, typeof pendingForEmail>());
 
-    // 4) Fetch user emails only once
+    // 4️⃣ Fetch user emails
     const userIds = [...problemsByUser.keys()];
     const users = await User.find(
       { _id: { $in: userIds } },
@@ -76,10 +62,11 @@ export async function GET() {
       ])
     );
 
-    // 5) Send email to each user with their due problems
+    // 5️⃣ Send emails
     for (const [uid, userProblems] of problemsByUser.entries()) {
       const user = userEmailMap.get(uid);
       if (!user?.email) continue;
+
       try {
         await sendEmailSummary({
           to: user.email,
@@ -96,7 +83,7 @@ export async function GET() {
         continue;
       }
 
-      // Update each problem's email timestamp
+      // 6️⃣ Update email sent date (store actual timestamp)
       await Problem.updateMany(
         { _id: { $in: userProblems.map((p: any) => p._id) } },
         { $set: { lastEmailSentDate: now } }
