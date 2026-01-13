@@ -5,16 +5,35 @@ import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
 import UpcomingReviews from "./dashboard/UpcomingReviews";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { toast } from "sonner";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import Navbar from "./Navbar";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const { data: session } = useSession();
   const user = session?.user;
+  // const [calendarOk, setCalendarOk] = useState<boolean | null>(null);
+  // useEffect(() => {
+  //   const accessToken = (session as any)?.accessToken;
+  //   if (!accessToken) return;
+
+  //   fetch("https://www.googleapis.com/calendar/v3/users/me/calendarList", {
+  //     headers: {
+  //       Authorization: `Bearer ${accessToken}`,
+  //     },
+  //   })
+  //     .then((res) => {
+  //       setCalendarOk(res.ok);
+  //     })
+  //     .catch(() => {
+  //       setCalendarOk(false);
+  //     });
+  // }, [session]);
 
   return (
     <div className="">
@@ -56,7 +75,24 @@ export default function Home() {
                     <Button
                       variant="outline"
                       className="w-full justify-start cursor-pointer"
-                      onClick={() => signOut()}
+                      onClick={async () => {
+                        signOut();
+                        await toast.promise<{ name: string }>(
+                          () =>
+                            new Promise((resolve) =>
+                              setTimeout(
+                                () => resolve({ name: user?.name ?? "You" }),
+                                300
+                              )
+                            ),
+                          {
+                            loading: "Logging user Out...",
+                            success: (data) =>
+                              `${data.name} have been successfully logged out. May take 1 or 2 second to change screen`,
+                            error: "Error",
+                          }
+                        );
+                      }}
                     >
                       Sign Out
                     </Button>
@@ -100,7 +136,13 @@ export default function Home() {
                 </p>
 
                 <Button
-                  onClick={() => signIn("google")}
+                  onClick={() =>
+                    signIn("google", {
+                      callbackUrl: "/",
+                      prompt: "consent",
+                      access_type: "offline",
+                    })
+                  }
                   className="w-full py-5 text-base font-medium flex items-center justify-center gap-3 border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 transition cursor-pointer"
                   variant="outline"
                 >
@@ -122,6 +164,11 @@ export default function Home() {
                   {" "}
                   Programmatic Navigation
                 </h2>
+                {/* <h1>Access Token : {JSON.stringify(user, null, 2)}</h1> */}
+                {/* <div>
+                  Google Calendar Access:{" "}
+                  {calendarOk === null ? "...d" : calendarOk ? "YES" : "NO"}
+                </div> */}
 
                 <div className="bg-white dark:bg-zinc-900 shadow-sm border rounded-xl p-6 space-y-3 text-lg">
                   <p className="cursor-pointer">

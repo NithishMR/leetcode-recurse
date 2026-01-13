@@ -9,16 +9,20 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { signOut, useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
+import { toast } from "sonner";
 
 export default function AccountSettings() {
   const { data: session } = useSession();
   const user = session?.user;
 
-  // THE FIX — use resolvedTheme instead of theme
   const { resolvedTheme, setTheme } = useTheme();
 
   const [darkMode, setDarkMode] = useState(false);
-  const [emailReminders, setEmailReminders] = useState(true);
+
+  // ✅ NEW: preferences loaded from DB
+  const [emailReminders, setEmailReminders] = useState<boolean>(true);
+  const [calendarReminders, setCalendarReminders] = useState<boolean>(true);
+  const [loadingPrefs, setLoadingPrefs] = useState<boolean>(true);
 
   // Sync toggle AFTER theme is loaded
   useEffect(() => {
@@ -27,12 +31,75 @@ export default function AccountSettings() {
     }
   }, [resolvedTheme]);
 
+  // ✅ NEW: Load preferences from backend
+  useEffect(() => {
+    const loadPrefs = async () => {
+      try {
+        const res = await fetch("/api/user/settings");
+        if (!res.ok) return;
+
+        const data = await res.json();
+        setEmailReminders(!!data.wantEmailReminder);
+        setCalendarReminders(!!data.wantCalendarReminder);
+      } catch (e) {
+        console.error("Failed to load settings", e);
+      } finally {
+        setLoadingPrefs(false);
+      }
+    };
+
+    if (user) loadPrefs();
+  }, [user]);
+
   const handleThemeChange = (checked: boolean) => {
     setDarkMode(checked);
     setTheme(checked ? "dark" : "light");
   };
-  const handleLogOut = () => {
+
+  // ✅ NEW: Save email toggle
+  const handleEmailToggle = async (checked: boolean) => {
+    setEmailReminders(checked);
+
+    try {
+      await fetch("/api/user/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wantEmailReminder: checked }),
+      });
+    } catch (e) {
+      console.error("Failed to update email reminder setting", e);
+    }
+  };
+
+  // ✅ NEW: Save calendar toggle
+  const handleCalendarToggle = async (checked: boolean) => {
+    setCalendarReminders(checked);
+
+    try {
+      await fetch("/api/user/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wantCalendarReminder: checked }),
+      });
+    } catch (e) {
+      console.error("Failed to update calendar reminder setting", e);
+    }
+  };
+
+  const handleLogOut = async () => {
     signOut();
+    await toast.promise<{ name: string }>(
+      () =>
+        new Promise((resolve) =>
+          setTimeout(() => resolve({ name: user?.name ?? "You" }), 300)
+        ),
+      {
+        loading: "Logging user Out...",
+        success: (data) =>
+          `${data.name} have been successfully logged out. May take 1 or 2 second to change screen`,
+        error: "Error",
+      }
+    );
   };
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-black flex items-start justify-center py-6 px-3 sm:py-12 sm:px-4 mt-14">
@@ -124,8 +191,24 @@ export default function AccountSettings() {
             <Switch
               id="emailReminders"
               checked={emailReminders}
-              onCheckedChange={setEmailReminders}
-              disabled
+              onCheckedChange={handleEmailToggle}
+              disabled={loadingPrefs}
+            />
+          </div>
+
+          {/* CALENDAR TOGGLE */}
+          <div className="flex justify-between items-center py-2">
+            <Label
+              htmlFor="calendarReminders"
+              className="text-gray-700 dark:text-gray-300"
+            >
+              Calendar Reminders
+            </Label>
+            <Switch
+              id="calendarReminders"
+              checked={calendarReminders}
+              onCheckedChange={handleCalendarToggle}
+              disabled={loadingPrefs}
             />
           </div>
         </section>
@@ -147,6 +230,7 @@ export default function AccountSettings() {
               Delete Account
             </Button>
           </div>
+
           <div className="flex flex-col gap-4">
             <Button
               variant="destructive"

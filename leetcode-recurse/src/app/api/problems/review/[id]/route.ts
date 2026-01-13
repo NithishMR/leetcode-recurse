@@ -1,6 +1,7 @@
 import ActivityLog from "@/database/ActivityLog";
 import { connectDB } from "@/database/connection";
 import Problem from "@/database/Problem";
+import User from "@/database/User";
 import { getToken } from "next-auth/jwt";
 import { NextResponse, NextRequest } from "next/server";
 
@@ -31,6 +32,8 @@ export async function POST(
         { status: 400 }
       );
     }
+    // get access token
+    const accessToken = token.accessToken;
 
     await connectDB();
 
@@ -47,6 +50,19 @@ export async function POST(
     if (problem.timesSolved >= 4) {
       problem.status = "completed";
       problem.nextReviewDate = null;
+
+      if (problem.calendarEventId && accessToken) {
+        try {
+          await deleteCalendarEvent({
+            accessToken,
+            calendarEventId: problem.calendarEventId,
+          });
+          problem.calendarEventId = null;
+        } catch (err) {
+          console.error("Failed to delete calendar event on completion", err);
+        }
+      }
+
       await problem.save();
       return NextResponse.json(problem, { status: 200 });
     }
@@ -85,6 +101,24 @@ export async function POST(
     nextDate.setDate(today.getDate() + daysToAdd);
 
     problem.nextReviewDate = nextDate;
+    const user = await User.findById(userId);
+
+    if (user?.wantCalendarReminder && problem.calendarEventId && accessToken) {
+      try {
+        await updateCalendarEvent({
+          accessToken,
+          calendarEventId: problem.calendarEventId,
+          title: `Anamnesis – Review: ${problem.problemName}`,
+          description: `Review problem: ${problem.problemName}\n${
+            problem.problemUrl || ""
+          }`,
+          startTime: nextDate.toISOString(),
+          endTime: new Date(nextDate.getTime() + 30 * 60 * 1000).toISOString(),
+        });
+      } catch (err) {
+        console.error("Failed to update calendar event", err);
+      }
+    }
 
     // 8. SAVE
     await problem.save();
@@ -100,4 +134,82 @@ export async function POST(
 function getSpacing(times: number) {
   const schedule = [7, 14, 30, 60];
   return schedule[Math.min(times - 1, schedule.length - 1)];
+}
+
+async function updateCalendarEvent({
+  accessToken,
+  calendarEventId,
+  title,
+  description,
+  startTime,
+  endTime,
+}: {
+  accessToken: string;
+  calendarEventId: string;
+  title: string;
+  description: string;
+  startTime: string; // ISO string
+  endTime: string; // ISO string
+}) {
+  const res = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/primary/events/${calendarEventId}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        summary: title,
+        description,
+        start: {
+          dateTime: startTime,
+          timeZone: "Asia/Kolkata",
+        },
+        end: {
+          dateTime: endTime,
+          timeZone: "Asia/Kolkata",
+        },
+        reminders: {
+          useDefault: false,
+          overrides: [
+            { method: "popup", minutes: 30 },
+            { method: "email", minutes: 60 },
+          ],
+        },
+      }),
+    }
+  );
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error("Calendar update failed: " + err);
+  }
+
+  return res.json();
+}
+async function deleteCalendarEvent({
+  accessToken,
+  calendarEventId,
+}: {
+  accessToken: string;
+  calendarEventId: string;
+}) {
+  const res = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/primary/events/${calendarEventId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  // Google returns 204 No Content on success
+  if (!res.ok && res.status !== 204) {
+    const err = await res.text();
+    throw new Error("Calendar delete failed: " + err);
+  }
+
+  return true;
 }
