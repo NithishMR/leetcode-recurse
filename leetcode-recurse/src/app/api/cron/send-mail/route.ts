@@ -23,6 +23,7 @@ export async function GET() {
     // 1️⃣ Get problems due today (UTC-safe)
     const problemsDueToday = await Problem.find({
       nextReviewDate: { $gte: startOfDayUTC, $lt: endOfDayUTC },
+      status: { $ne: "completed" },
     });
     console.log(problemsDueToday);
     if (problemsDueToday.length === 0) {
@@ -52,13 +53,13 @@ export async function GET() {
     const userIds = [...problemsByUser.keys()];
     const users = await User.find(
       { _id: { $in: userIds } },
-      { email: 1, name: 1 }
+      { email: 1, name: 1, wantEmailReminder: 1 }
     );
 
     const userEmailMap = new Map(
       users.map((u) => [
         u._id.toString(),
-        { email: u.email, name: u.name || "" },
+        { email: u.email, name: u.name || "", sendEmail: u.wantEmailReminder },
       ])
     );
 
@@ -66,6 +67,9 @@ export async function GET() {
     for (const [uid, userProblems] of problemsByUser.entries()) {
       const user = userEmailMap.get(uid);
       if (!user?.email) continue;
+      if (!user?.sendEmail) {
+        continue;
+      }
 
       try {
         await sendEmailSummary({

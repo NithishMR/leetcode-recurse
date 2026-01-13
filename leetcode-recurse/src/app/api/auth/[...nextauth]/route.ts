@@ -11,6 +11,12 @@ const handler = NextAuth({
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          scope:
+            "openid email profile https://www.googleapis.com/auth/calendar.events",
+        },
+      },
     }),
   ],
 
@@ -50,11 +56,15 @@ const handler = NextAuth({
       return true;
     },
 
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       // When user signs in for first time, add MongoDB id to token
+      if (account) {
+        token.accessToken = account.access_token;
+      }
       if (user) {
         token.user = user;
       }
+      // console.log("toki token", token);
       return token;
     },
 

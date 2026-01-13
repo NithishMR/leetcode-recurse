@@ -9,6 +9,8 @@ const UserSchema = new mongoose.Schema(
 
     provider: { type: String },
     providerAccountId: { type: String },
+    wantEmailReminder: { type: Boolean, default: false },
+    wantCalendarReminder: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

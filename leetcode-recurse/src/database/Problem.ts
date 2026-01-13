@@ -9,6 +9,11 @@ const ProblemSchema = new mongoose.Schema(
       required: true,
       index: true, // important
     },
+    calendarEventId: {
+      type: String,
+      default: null,
+      index: true,
+    },
 
     problemName: { type: String, required: true, index: true },
     problemUrl: { type: String, required: true },
