@@ -4,7 +4,11 @@ export default function Documentation() {
   return (
     <div className="min-h-screen bg-white dark:bg-black text-gray-800 dark:text-gray-200 px-4 sm:px-6 py-12 mt-14">
       {/* HEADER */}
-      <header className="text-center mb-12 sm:mb-16">
+      <header className="text-center mb-12 sm:mb-16 relative">
+        <div
+          className="absolute top-20 left-52 w-2.5 h-2.5 rounded-full"
+          id="docs-page"
+        ></div>
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
           📘 Documentation
         </h1>
@@ -139,7 +143,11 @@ export default function Documentation() {
 
             <p>
               Clicking{" "}
-              <b>
+              <b className="relative">
+                <b
+                  className="absolute  w-[130px] h-2.5 top-15 rounded-full "
+                  id="problem-review-instruction"
+                ></b>
                 <i>Solve the problem</i>
               </b>{" "}
               resets the next review date automatically.

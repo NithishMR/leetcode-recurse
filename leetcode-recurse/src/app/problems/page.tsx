@@ -19,8 +19,16 @@ export default function ProblemsEntryPage() {
         {/* Add by URL (Primary) */}
         <div className="border border-gray-200 dark:border-[#262626] dark:bg-[#161616]">
           <div className="p-5 space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="mt-1 text-blue-600 dark:text-blue-400">
+            <div className="flex items-start gap-3 relative">
+              <div
+                className="w-[110px] absolute pt-2 pb-10  top-28 right-0"
+                id="manual-problem-entry"
+              ></div>
+              <div
+                className="w-[140px] absolute pb-8 top-72 right-0"
+                id="automated-problem-entry"
+              ></div>
+              <div className=" text-blue-600 dark:text-blue-400 ">
                 <Link2 size={20} />
               </div>
               <div className="flex-1 space-y-1">
@@ -39,7 +47,7 @@ export default function ProblemsEntryPage() {
               </span>
 
               <Link href="/problems/add-by-url">
-                <Button className="gap-2 cursor-pointer">
+                <Button className="gap-2 cursor-pointer ">
                   Continue <ArrowRight size={16} />
                 </Button>
               </Link>

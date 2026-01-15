@@ -4,7 +4,7 @@ import "./globals.css";
 import ClientProviders from "./clientProviders";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
-
+import { NextStepProvider, NextStep, Tour } from "nextstepjs";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -18,6 +18,164 @@ export const metadata: Metadata = {
   title: "Anamnesis",
   description: "Daily Problem Tracker",
 };
+const steps: Tour[] = [
+  {
+    tour: "docs-demo",
+    steps: [
+      {
+        icon: <>🧭</>,
+        title: "Quick Navigation",
+        content: (
+          <>
+            This short tour highlights only the parts that might feel confusing.
+            Everything else is meant to be explored naturally.
+            <br />
+            <br />
+            If you prefer navigating by routes, these are the main pages you can
+            visit.
+          </>
+        ),
+        selector: "#programmatic-navigation",
+        side: "right",
+        showControls: true,
+        showSkip: true,
+        pointerPadding: 10,
+        pointerRadius: 10,
+      },
+
+      {
+        icon: <>📅</>,
+        title: "Upcoming Reviews",
+        content: (
+          <>
+            You can see the problems you need to review here.
+            <br />
+            This section shows reviews due in the next 7 days.
+          </>
+        ),
+        selector: "#upcoming-reviews",
+        side: "top",
+        showControls: true,
+        showSkip: true,
+        pointerPadding: 10,
+        pointerRadius: 10,
+        viewportID: "scrollable-viewport",
+        nextRoute: "/problems",
+        prevRoute: "/",
+      },
+
+      {
+        icon: <>✍️</>,
+        title: "Add a Problem (Manual)",
+        content: (
+          <>
+            Use this option if you want to enter all details yourself.
+            <br />
+            Works for any platform.
+          </>
+        ),
+        selector: "#manual-problem-entry",
+        side: "left",
+        showControls: true,
+        showSkip: true,
+        pointerPadding: 10,
+        pointerRadius: 10,
+      },
+
+      {
+        icon: <>⚡</>,
+        title: "Add a Problem (By URL)",
+        content: (
+          <>
+            Use this option to auto-fill problem details using a link.
+            <br />
+            Currently supported only for LeetCode.
+          </>
+        ),
+        selector: "#automated-problem-entry",
+        side: "left",
+        showControls: true,
+        showSkip: true,
+        pointerPadding: 10,
+        pointerRadius: 10,
+        viewportID: "scrollable-viewport",
+        nextRoute: "/docs",
+        prevRoute: "/problems",
+      },
+
+      {
+        icon: <>📘</>,
+        title: "Docs & Help",
+        content: (
+          <>
+            This is the documentation page.
+            <br />
+            You can always come back here if you forget how something works.
+          </>
+        ),
+        selector: "#docs-page",
+        side: "top",
+        showControls: true,
+        showSkip: true,
+        pointerPadding: 10,
+        pointerRadius: 10,
+      },
+
+      {
+        icon: <>🧠</>,
+        title: "Review a Problem",
+        content: (
+          <>
+            When you open a problem from the View page, you’ll see a
+            <b> Review / Solve </b> button.
+            <br />
+            <br />
+            Clicking it means you reviewed the problem, and you’ll be redirected
+            to the original platform link.
+            <br />
+            Anamnesis will then schedule the next review automatically.
+            <br />
+            <br />
+            Try this after adding your first problem.
+          </>
+        ),
+        selector: "#problem-review-instruction",
+        side: "left",
+        showControls: true,
+        showSkip: true,
+        pointerPadding: 10,
+        pointerRadius: 10,
+        nextRoute: "/account-settings",
+        prevRoute: "/docs",
+      },
+
+      {
+        icon: <>🔔</>,
+        title: "Reminders & Notifications",
+        content: (
+          <>
+            Anamnesis can remind you through <b>Google Calendar</b> and{" "}
+            <b>Email</b>.
+            <br />
+            <br />
+            Email reminders are <b>OFF</b> by default.
+            <br />
+            Calendar sync is <b>ON</b> by default.
+            <br />
+            <br />
+            You can enable either one — or use both.
+          </>
+        ),
+        selector: "#calendar-page-color-settings",
+        side: "top",
+        showControls: true,
+        showSkip: true,
+        pointerPadding: 10,
+        pointerRadius: 10,
+      },
+    ],
+  },
+];
 
 export default function RootLayout({
   children,
@@ -33,7 +191,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ClientProviders>{children}</ClientProviders>
+          <NextStepProvider>
+            <NextStep steps={steps}>
+              <ClientProviders>{children}</ClientProviders>
+            </NextStep>
+          </NextStepProvider>
           <Toaster richColors position="top-right" />
         </ThemeProvider>
       </body>
