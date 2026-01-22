@@ -57,7 +57,7 @@ function ProblemsViewPage() {
   // filter end
   const { data, error, isLoading } = useSWR(
     `/api/problems?page=${currentPage}&limit=10`,
-    fetcher
+    fetcher,
   );
   // useEffect(() => {
   //   const fetchPage = async () => {
@@ -123,7 +123,7 @@ function ProblemsViewPage() {
         loading: "Deleting problem...",
         success: "Problem deleted successfully!",
         error: "Failed to delete problem",
-      }
+      },
     );
   };
 
@@ -135,14 +135,14 @@ function ProblemsViewPage() {
     //  Difficulty filter
     if (difficultyFilter !== "any") {
       filtered = filtered.filter(
-        (p) => p.difficulty.toLowerCase() === difficultyFilter.toLowerCase()
+        (p) => p.difficulty.toLowerCase() === difficultyFilter.toLowerCase(),
       );
     }
 
     // Platform/Source filter
     if (sourceFilter !== "any") {
       filtered = filtered.filter(
-        (p) => p.source.toLowerCase() === sourceFilter.toLowerCase()
+        (p) => p.source.toLowerCase() === sourceFilter.toLowerCase(),
       );
     }
 
@@ -566,7 +566,7 @@ function ProblemsViewPage() {
                             />
                           </TableCell>
                         </TableRow>
-                      )
+                      ),
                     )
                   )}
                 </TableBody>

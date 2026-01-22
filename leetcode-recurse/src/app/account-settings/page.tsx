@@ -101,6 +101,7 @@ export default function AccountSettings() {
       }
     );
   };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-black flex items-start justify-center py-6 px-3 sm:py-12 sm:px-4 mt-14">
       <div className="w-full max-w-3xl bg-white dark:bg-zinc-900 rounded-xl sm:rounded-2xl shadow-lg p-6 sm:p-10 space-y-10 border border-gray-200 dark:border-zinc-800">
@@ -162,7 +163,11 @@ export default function AccountSettings() {
         <Separator />
 
         {/* ================= PREFERENCES ================= */}
-        <section className="space-y-6">
+        <section className="space-y-6 relative">
+          <b
+            className="absolute  w-[100px] h-5 left-0  top-15 rounded-full "
+            id="calendar-page-color-settings"
+          ></b>
           <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
             Preferences
           </h2>

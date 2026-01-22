@@ -13,10 +13,17 @@ import {
 } from "@/components/ui/popover";
 import Navbar from "./Navbar";
 import { useState, useEffect } from "react";
-
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { useNextStep } from "nextstepjs";
 export default function Home() {
   const { data: session } = useSession();
   const user = session?.user;
+  const { startNextStep } = useNextStep();
   // const [calendarOk, setCalendarOk] = useState<boolean | null>(null);
   // useEffect(() => {
   //   const accessToken = (session as any)?.accessToken;
@@ -48,7 +55,9 @@ export default function Home() {
                   <AvatarImage
                     src={user?.image ?? "https://github.com/shadcn.png"}
                   />
-                  <AvatarFallback>U</AvatarFallback>
+                  <AvatarFallback>
+                    <b>U</b>
+                  </AvatarFallback>
                 </Avatar>
               </PopoverTrigger>
 
@@ -62,6 +71,13 @@ export default function Home() {
 
                   {/* ACCOUNT SETTINGS */}
                   <div className="flex flex-col justify-around gap-2">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left cursor-pointer"
+                      onClick={() => startNextStep("docs-demo")}
+                    >
+                      🧭 Anamnesis Tour
+                    </Button>
                     <Link href="/account-settings">
                       <Button
                         variant="outline"
@@ -82,15 +98,15 @@ export default function Home() {
                             new Promise((resolve) =>
                               setTimeout(
                                 () => resolve({ name: user?.name ?? "You" }),
-                                300
-                              )
+                                300,
+                              ),
                             ),
                           {
                             loading: "Logging user Out...",
                             success: (data) =>
                               `${data.name} have been successfully logged out. May take 1 or 2 second to change screen`,
                             error: "Error",
-                          }
+                          },
                         );
                       }}
                     >
@@ -159,16 +175,14 @@ export default function Home() {
 
           {user && (
             <>
-              <section className="space-y-6">
+              <section
+                className="space-y-6 pb-14 "
+                id="programmatic-navigation"
+              >
                 <h2 className="text-3xl font-bold text-center">
                   {" "}
                   Programmatic Navigation
                 </h2>
-                {/* <h1>Access Token : {JSON.stringify(user, null, 2)}</h1> */}
-                {/* <div>
-                  Google Calendar Access:{" "}
-                  {calendarOk === null ? "...d" : calendarOk ? "YES" : "NO"}
-                </div> */}
 
                 <div className="bg-white dark:bg-zinc-900 shadow-sm border rounded-xl p-6 space-y-3 text-lg">
                   <p className="cursor-pointer">
@@ -204,8 +218,45 @@ export default function Home() {
                   </p>
                 </div>
               </section>
+              <section className="space-y-6">
+                <div className="min-h-28 w-full px-4 grid place-items-center">
+                  <div className="w-full max-w-2xl rounded-2xl border border-border bg-background/70 backdrop-blur-md shadow-sm p-6 mt-10">
+                    <Accordion type="single" collapsible className="space-y-4">
+                      <AccordionItem
+                        value="item-1"
+                        className="rounded-xl border border-border bg-card shadow-sm overflow-hidden"
+                      >
+                        <AccordionTrigger className="cursor-pointer px-4 py-3 text-left font-medium text-base transition hover:bg-muted">
+                          How to review a problem
+                        </AccordionTrigger>
 
-              <section className="space-y-4">
+                        <AccordionContent className="px-4 pb-4 pt-2 text-sm leading-relaxed text-muted-foreground">
+                          When you open a problem from the View page by clicking
+                          on a particular problem, you’ll see a{" "}
+                          <span className="font-semibold text-foreground">
+                            Review / Solve the problem
+                          </span>{" "}
+                          button.
+                          <br />
+                          <br />
+                          Clicking it means you reviewed the problem, and you’ll
+                          be redirected to the original platform link.
+                          <br />
+                          Anamnesis will then schedule the next review
+                          automatically.
+                          <br />
+                          <br />
+                          <span className="font-medium text-foreground">
+                            Try this after adding your first problem.
+                          </span>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  </div>
+                </div>
+              </section>
+
+              <section className="space-y-4 pb-10" id="upcoming-reviews">
                 <h2 className="text-2xl font-semibold text-center">
                   Problems to Solve This Week
                 </h2>
@@ -218,6 +269,9 @@ export default function Home() {
           )}
         </div>
       </div>
+      {/* <button onClick={() => startNextStep("docs-demo")}>
+        Start Demo Tour
+      </button> */}
     </div>
   );
 }
