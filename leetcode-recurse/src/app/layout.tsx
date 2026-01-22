@@ -5,6 +5,7 @@ import ClientProviders from "./clientProviders";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { NextStepProvider, NextStep, Tour } from "nextstepjs";
+import TailwindDarkModeCard from "./TailwindDarkModeCard";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -36,11 +37,12 @@ const steps: Tour[] = [
           </>
         ),
         selector: "#programmatic-navigation",
-        side: "right",
+        side: "left",
         showControls: true,
         showSkip: true,
         pointerPadding: 10,
         pointerRadius: 10,
+        nextRoute: "/",
       },
 
       {
@@ -80,6 +82,8 @@ const steps: Tour[] = [
         showSkip: true,
         pointerPadding: 10,
         pointerRadius: 10,
+        prevRoute: "/",
+        nextRoute: "/problems",
       },
 
       {
@@ -99,6 +103,29 @@ const steps: Tour[] = [
         pointerPadding: 10,
         pointerRadius: 10,
         viewportID: "scrollable-viewport",
+        nextRoute: "/view-problems/1",
+        prevRoute: "/problems",
+      },
+      {
+        icon: <>🧠</>,
+        title: "Review a Problem",
+        content: (
+          <>
+            Clicking this button means you reviewed the problem, and you’ll be
+            redirected to the original platform link.
+            <br />
+            Anamnesis will then schedule the next review automatically.
+            <br />
+            <br />
+            Try this after adding your first problem.
+          </>
+        ),
+        selector: "#problem-review-instruction-page",
+        side: "bottom",
+        showControls: true,
+        showSkip: true,
+        pointerPadding: 10,
+        pointerRadius: 10,
         nextRoute: "/docs",
         prevRoute: "/problems",
       },
@@ -119,34 +146,8 @@ const steps: Tour[] = [
         showSkip: true,
         pointerPadding: 10,
         pointerRadius: 10,
-      },
-
-      {
-        icon: <>🧠</>,
-        title: "Review a Problem",
-        content: (
-          <>
-            When you open a problem from the View page, you’ll see a
-            <b> Review / Solve </b> button.
-            <br />
-            <br />
-            Clicking it means you reviewed the problem, and you’ll be redirected
-            to the original platform link.
-            <br />
-            Anamnesis will then schedule the next review automatically.
-            <br />
-            <br />
-            Try this after adding your first problem.
-          </>
-        ),
-        selector: "#problem-review-instruction",
-        side: "left",
-        showControls: true,
-        showSkip: true,
-        pointerPadding: 10,
-        pointerRadius: 10,
         nextRoute: "/account-settings",
-        prevRoute: "/docs",
+        prevRoute: "/view-problems/1",
       },
 
       {
@@ -172,6 +173,7 @@ const steps: Tour[] = [
         showSkip: true,
         pointerPadding: 10,
         pointerRadius: 10,
+        prevRoute: "/docs",
       },
     ],
   },
@@ -192,7 +194,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <NextStepProvider>
-            <NextStep steps={steps}>
+            <NextStep
+              steps={steps}
+              cardComponent={TailwindDarkModeCard}
+              shadowRgb="0, 0, 0"
+              shadowOpacity="0.65"
+            >
               <ClientProviders>{children}</ClientProviders>
             </NextStep>
           </NextStepProvider>

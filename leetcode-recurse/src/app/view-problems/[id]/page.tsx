@@ -99,7 +99,7 @@ export default function ProblemDetails() {
 
   return (
     <div className="min-h-screen py-12 mt-10 bg-gray-50 dark:bg-[#0d0d0d]">
-      <div className="max-w-4xl mx-auto space-y-10 px-4">
+      <div className="max-w-4xl mx-auto space-y-10 px-4 relative">
         {/* HEADER */}
         <div
           className="
@@ -126,20 +126,26 @@ export default function ProblemDetails() {
             </div>
           </div>
 
-          {problem.status !== "completed" && (
-            <Button
-              disabled={clicked}
-              onClick={!clicked ? handleReviewed : undefined}
-              className="
+          <div className="relative">
+            <div
+              className="absolute right-0 top-11 w-[170px] h-10"
+              id="problem-review-instruction-page"
+            ></div>
+            {problem.status !== "completed" && (
+              <Button
+                disabled={clicked}
+                onClick={!clicked ? handleReviewed : undefined}
+                className="
                 px-5 py-3
                 bg-blue-600 hover:bg-blue-700
                 text-white
                 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer
               "
-            >
-              {clicked ? "Already clicked →" : "Solve the Problem →"}
-            </Button>
-          )}
+              >
+                {clicked ? "Already clicked →" : "Solve the Problem →"}
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* STATS */}
