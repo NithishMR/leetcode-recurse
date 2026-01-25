@@ -81,8 +81,8 @@ const steps: Tour[] = [
         showSkip: true,
         pointerPadding: 10,
         pointerRadius: 10,
-        prevRoute: "/",
-        nextRoute: "/problems",
+
+        // ✅ no route changes here
       },
 
       {
@@ -101,9 +101,10 @@ const steps: Tour[] = [
         showSkip: true,
         pointerPadding: 10,
         pointerRadius: 10,
-        nextRoute: "/view-problems/1",
         prevRoute: "/problems",
+        nextRoute: "/view-problems/1",
       },
+
       {
         icon: <>🧠</>,
         title: "Review a Problem",
