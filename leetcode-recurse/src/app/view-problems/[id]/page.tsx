@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import useSWR, { mutate } from "swr";
-
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const formatDate = (dateStr: string | null | undefined) => {
@@ -227,9 +228,16 @@ export default function ProblemDetails() {
                   </button>
 
                   {visibleSolutions[sol.review] && (
-                    <pre className="mt-4 bg-black text-green-400 p-4 rounded overflow-x-auto text-sm">
-                      <code>{sol.code}</code>
-                    </pre>
+                    // <pre className="mt-4 bg-black text-green-400 p-4 rounded overflow-x-auto text-sm">
+                    //   <code>{sol.code}</code>
+                    // </pre>
+                    <SyntaxHighlighter
+                      language={sol.language}
+                      style={oneDark}
+                      className="mt-4 rounded text-sm"
+                    >
+                      {sol.code}
+                    </SyntaxHighlighter>
                   )}
                 </div>
               ))}
