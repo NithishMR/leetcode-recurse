@@ -287,11 +287,11 @@ function ProblemsViewPage() {
                           onChange={setSourceFilter}
                           options={[
                             { label: "Platform", value: "any" },
-                            { label: "LeetCode", value: "leetcode" },
-                            { label: "GFG", value: "geeksforgeeks" },
-                            { label: "Codeforces", value: "codeforces" },
-                            { label: "CodeChef", value: "coderchef" },
-                            { label: "HackerRank", value: "hackerrank" },
+                            { label: "LeetCode", value: "leetcode.com" },
+                            { label: "GFG", value: "geeksforgeeks.org" },
+                            { label: "Codeforces", value: "codeforces.com" },
+                            { label: "CodeChef", value: "coderchef.com" },
+                            { label: "HackerRank", value: "hackerrank.com" },
                           ]}
                         />
                       </div>
@@ -428,7 +428,7 @@ function ProblemsViewPage() {
                           <Link href={`view-problems/${datum._id}`}>
                             <div className="flex items-center gap-4">
                               <img
-                                src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${datum.source}&size=64`}
+                                src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://${datum.source}&size=64`}
                                 alt="platform icon"
                                 width="25"
                                 height="25"
@@ -524,7 +524,7 @@ function ProblemsViewPage() {
                             <Link href={`view-problems/${datum._id}`}>
                               <div className="flex items-center gap-4">
                                 <img
-                                  src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${datum.source}&size=64`}
+                                  src={`https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://www.${datum.source}&size=64`}
                                   alt="platform icon"
                                   width="25"
                                   height="25"

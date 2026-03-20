@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
     console.error("Error fetching problems:", error);
     return NextResponse.json(
       { error: "Failed to fetch problems" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -71,7 +71,7 @@ export async function DELETE(req: NextRequest) {
     if (!_id) {
       return NextResponse.json(
         { error: "Problem ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -92,7 +92,7 @@ export async function DELETE(req: NextRequest) {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
-          }
+          },
         );
       } catch (err) {
         console.error("Failed to delete calendar event", {
@@ -127,13 +127,13 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json(
       { message: "Problem deleted", deleted },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Error deleting problem:", error);
     return NextResponse.json(
       { error: "Failed to delete problem" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -160,7 +160,7 @@ export async function POST(req: NextRequest) {
       // console.log("access token error");
       return NextResponse.json(
         { error: "Google Calendar not connected" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     // 2. READ BODY
@@ -172,7 +172,7 @@ export async function POST(req: NextRequest) {
     if (!dateSolved) {
       return NextResponse.json(
         { error: "dateSolved is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     // 3. NORMALIZE TO UTC MIDNIGHT
@@ -214,7 +214,7 @@ export async function POST(req: NextRequest) {
           description: `Review problem: ${problemName}\n${problemUrl || ""}`,
           startTime: nextReviewDate.toISOString(),
           endTime: new Date(
-            nextReviewDate.getTime() + 30 * 60 * 1000
+            nextReviewDate.getTime() + 30 * 60 * 1000,
           ).toISOString(),
         });
 
@@ -255,14 +255,14 @@ export async function POST(req: NextRequest) {
     console.error("Error creating problem:", error);
     return NextResponse.json(
       { error: "Failed to create problem" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 function toUTCMidnight(date: Date) {
   return new Date(
-    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
   );
 }
 
@@ -308,7 +308,7 @@ async function createCalendarEvent({
           ],
         },
       }),
-    }
+    },
   );
 
   if (!res.ok) {

@@ -2,6 +2,7 @@
 
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import GitHubProvider from "next-auth/providers/github";
 import { connectDB } from "@/database/connection";
 import User from "@/database/User";
 import { sendWelcomeMailToNewUser } from "@/utils/newUserMail";
@@ -18,6 +19,15 @@ const handler = NextAuth({
         },
       },
     }),
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID!,
+      clientSecret: process.env.GITHUB_SECRET!,
+      authorization: {
+        params: {
+          scope: "read:user user:email repo",
+        },
+      },
+    }),
   ],
 
   session: {
@@ -25,46 +35,73 @@ const handler = NextAuth({
   },
 
   callbacks: {
-    async signIn({ user }) {
-      //  Ensure DB is connected
-      //console.log("user full info retrieved: ", user);
+    async signIn({ user, account }) {
       await connectDB();
 
-      //  Look for user in MongoDB
       let existingUser = await User.findOne({ email: user.email });
 
-      //  If first time → create user
       if (!existingUser) {
         existingUser = await User.create({
           name: user.name,
           email: user.email,
           image: user.image,
         });
+
         sendWelcomeMailToNewUser({
           to: existingUser.email,
           username: existingUser.name,
         }).catch((err) => console.error("Welcome mail failed:", err));
-
-        console.log("Auth sign-in:", user.email);
-      } else {
-        console.log("✔Existing user:");
       }
 
-      // 4 Attach DB id to user object for JWT callback
-      user.id = existingUser._id.toString();
+      // ✅ Save Google token to DB
+      if (account?.provider === "google") {
+        existingUser.googleAccessToken = account.access_token;
+        await existingUser.save();
+      }
 
+      // ✅ Save GitHub token to DB (unchanged)
+      if (account?.provider === "github") {
+        const res = await fetch("https://api.github.com/user", {
+          headers: { Authorization: `Bearer ${account.access_token}` },
+        });
+        const githubData = await res.json();
+        existingUser.githubAccessToken = account.access_token;
+        existingUser.githubUsername = githubData.login;
+        await existingUser.save();
+      }
+
+      user.id = existingUser._id.toString();
       return true;
     },
 
     async jwt({ token, user, account }) {
-      // When user signs in for first time, add MongoDB id to token
-      if (account) {
-        token.accessToken = account.access_token;
-      }
       if (user) {
         token.user = user;
       }
-      // console.log("toki token", token);
+
+      if (account?.provider === "google") {
+        token.accessToken = account.access_token;
+      }
+
+      if (account?.provider === "github") {
+        token.githubAccessToken = account.access_token;
+        token.githubUsername = account.providerAccountId;
+      }
+
+      // ✅ Restore tokens from DB on every request if missing
+      if (token.user?.id) {
+        await connectDB();
+        const dbUser = await User.findById((token.user as any).id);
+
+        if (!token.accessToken && dbUser?.googleAccessToken) {
+          token.accessToken = dbUser.googleAccessToken;
+        }
+
+        if (!token.githubAccessToken && dbUser?.githubAccessToken) {
+          token.githubAccessToken = dbUser.githubAccessToken;
+        }
+      }
+
       return token;
     },
 

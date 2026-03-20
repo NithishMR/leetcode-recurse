@@ -1,8 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import useSWR, { mutate } from "swr";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const formatDate = (dateStr: string | null | undefined) => {
   if (!dateStr) return "—";
@@ -66,30 +69,68 @@ export default function ProblemDetails() {
   const router = useRouter();
   const { id } = useParams();
 
-  const [problem, setProblem] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [clicked, setClicked] = useState(false);
+  const [visibleSolutions, setVisibleSolutions] = useState<
+    Record<number, boolean>
+  >({});
 
+  // ==========================
+  // 🔹 PROBLEM FETCH (CACHED)
+  // ==========================
+  const { data: problem, isLoading } = useSWR(
+    id ? `/api/problems/details/${id}` : null,
+    fetcher,
+    {
+      dedupingInterval: 1000 * 60 * 5, // 5 min cache
+      revalidateOnFocus: false,
+    },
+  );
+
+  // ==========================
+  // 🔹 SOLUTIONS FETCH (CACHED)
+  // ==========================
+  const safeProblemName = problem?.problemName
+    ?.toLowerCase()
+    .replace(/\s+/g, "-");
+
+  const { data: solutions = [], isLoading: loadingSolutions } = useSWR(
+    safeProblemName
+      ? `/api/github/get-solutions?problemName=${safeProblemName}`
+      : null,
+    fetcher,
+    {
+      dedupingInterval: 1000 * 60 * 5, // cache GitHub calls
+      revalidateOnFocus: false,
+    },
+  );
+
+  // ==========================
+  // 🔹 REVIEW HANDLER
+  // ==========================
   const handleReviewed = async () => {
     setClicked(true);
     try {
       await fetch(`/api/problems/review/${id}`, { method: "POST" });
+
+      // 🔥 refresh cached problem data
+      mutate(`/api/problems/details/${id}`);
+
       window.location.href = problem.problemUrl;
       router.refresh();
     } catch {}
   };
 
-  useEffect(() => {
-    async function load() {
-      const res = await fetch(`/api/problems/details/${id}`);
-      const data = await res.json();
-      setProblem(data);
-      setLoading(false);
-    }
-    load();
-  }, [id]);
+  // ==========================
+  // 🔹 TOGGLE SOLUTION
+  // ==========================
+  const toggleSolution = (review: number) => {
+    setVisibleSolutions((prev) => ({
+      ...prev,
+      [review]: !prev[review],
+    }));
+  };
 
-  if (loading) {
+  if (isLoading || !problem) {
     return (
       <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-[#0d0d0d]">
         <p className="text-xl text-gray-600 dark:text-gray-300">Loading…</p>
@@ -101,16 +142,7 @@ export default function ProblemDetails() {
     <div className="min-h-screen py-12 mt-10 bg-gray-50 dark:bg-[#0d0d0d]">
       <div className="max-w-4xl mx-auto space-y-10 px-4 relative">
         {/* HEADER */}
-        <div
-          className="
-            bg-white p-8 rounded-2xl border shadow-lg
-            flex justify-between items-center
-
-            dark:bg-[#161616]
-            dark:border-[#262626]
-            dark:shadow-none
-          "
-        >
+        <div className="bg-white p-8 rounded-2xl border shadow-lg flex justify-between items-center dark:bg-[#161616] dark:border-[#262626] dark:shadow-none">
           <div>
             <h1 className="text-4xl font-extrabold text-gray-900 dark:text-[#e5e5e5]">
               {problem.problemName}
@@ -118,7 +150,7 @@ export default function ProblemDetails() {
 
             <div className="mt-4 flex items-center gap-2 text-gray-600 dark:text-gray-300">
               <img
-                src={`https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&url=http://${problem.source}&size=32`}
+                src={`https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&url=https://${problem.source}&size=32`}
                 className="rounded-md"
                 alt=""
               />
@@ -126,21 +158,12 @@ export default function ProblemDetails() {
             </div>
           </div>
 
-          <div className="relative">
-            <div
-              className="absolute right-0 top-11 w-[170px] h-10"
-              id="problem-review-instruction-page"
-            ></div>
+          <div>
             {problem.status !== "completed" && (
               <Button
                 disabled={clicked}
                 onClick={!clicked ? handleReviewed : undefined}
-                className="
-                px-5 py-3
-                bg-blue-600 hover:bg-blue-700
-                text-white
-                disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer
-              "
+                className="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 cursor-pointer"
               >
                 {clicked ? "Already clicked →" : "Solve the Problem →"}
               </Button>
@@ -168,20 +191,50 @@ export default function ProblemDetails() {
         </div>
 
         {/* NOTES */}
-        <div
-          className="
-            bg-white p-8 rounded-2xl border shadow-md
-            dark:bg-[#161616]
-            dark:border-[#262626]
-            dark:shadow-none
-          "
-        >
+        <div className="bg-white p-8 rounded-2xl border shadow-md dark:bg-[#161616] dark:border-[#262626]">
           <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-[#e5e5e5]">
             Notes & Observations
           </h2>
           <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
             {problem.notes || "No notes yet."}
           </p>
+        </div>
+
+        {/* SOLUTIONS */}
+        <div className="bg-white p-8 rounded-2xl border shadow-md dark:bg-[#161616] dark:border-[#262626]">
+          <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-[#e5e5e5]">
+            Your Solutions
+          </h2>
+
+          {loadingSolutions ? (
+            <p className="text-gray-500">Loading solutions...</p>
+          ) : solutions.length === 0 ? (
+            <p className="text-gray-500">No solutions yet.</p>
+          ) : (
+            <div className="space-y-4">
+              {solutions.map((sol: any) => (
+                <div
+                  key={sol.review}
+                  className="border rounded-lg p-4 dark:border-[#333]"
+                >
+                  <button
+                    onClick={() => toggleSolution(sol.review)}
+                    className="text-blue-600 hover:underline font-medium"
+                  >
+                    {visibleSolutions[sol.review]
+                      ? `Hide Solution Review ${sol.review}`
+                      : `Show Solution Review ${sol.review}`}
+                  </button>
+
+                  {visibleSolutions[sol.review] && (
+                    <pre className="mt-4 bg-black text-green-400 p-4 rounded overflow-x-auto text-sm">
+                      <code>{sol.code}</code>
+                    </pre>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -190,17 +243,7 @@ export default function ProblemDetails() {
 
 function StatCard({ icon: Icon, label, value }: any) {
   return (
-    <div
-      className="
-        bg-white p-6 rounded-xl border shadow-md transition
-        hover:shadow-xl
-
-        dark:bg-[#161616]
-        dark:border-[#262626]
-        dark:shadow-none
-        dark:hover:bg-[#1f1f1f]
-      "
-    >
+    <div className="bg-white p-6 rounded-xl border shadow-md hover:shadow-xl dark:bg-[#161616] dark:border-[#262626]">
       <div className="flex flex-col items-center gap-2">
         <Icon />
         <p className="text-sm uppercase tracking-wide text-gray-500 dark:text-gray-400">

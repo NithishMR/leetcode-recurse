@@ -12,7 +12,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import Navbar from "./Navbar";
-import { useState, useEffect } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -20,10 +19,19 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useNextStep } from "nextstepjs";
+import useSWR, { useSWRConfig } from "swr";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 export default function Home() {
   const { data: session } = useSession();
   const user = session?.user;
   const { startNextStep } = useNextStep();
+  const { mutate } = useSWRConfig();
+  const { data: githubStatus } = useSWR(
+    user ? "/api/github/status" : null,
+    fetcher,
+  );
   // const [calendarOk, setCalendarOk] = useState<boolean | null>(null);
   // useEffect(() => {
   //   const accessToken = (session as any)?.accessToken;
@@ -175,6 +183,46 @@ export default function Home() {
 
           {user && (
             <>
+              {/* 🔹 CONNECT GITHUB */}
+              {githubStatus && !githubStatus.isGithubConnected && (
+                <button
+                  className="cursor-pointer"
+                  onClick={() => signIn("github")}
+                >
+                  Connect GitHub
+                </button>
+              )}
+
+              {/* 🔹 INIT REPO */}
+              {githubStatus?.isGithubConnected && !githubStatus?.hasRepo && (
+                <button
+                  onClick={async () => {
+                    try {
+                      const res = await fetch("/api/github/repo-init", {
+                        method: "POST",
+                      });
+
+                      const data = await res.json();
+
+                      if (!res.ok) {
+                        alert(data.error || "Something went wrong");
+                        return;
+                      }
+
+                      alert(data.message);
+
+                      // 🔥 refresh status after init
+                      mutate("/api/github/status");
+                    } catch (err) {
+                      console.error(err);
+                      alert("Failed to initialize repo");
+                    }
+                  }}
+                  className="w-full py-3 text-base font-medium border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 transition cursor-pointer"
+                >
+                  Initialize GitHub Repo
+                </button>
+              )}
               <section
                 className="space-y-6 pb-14 "
                 id="programmatic-navigation"

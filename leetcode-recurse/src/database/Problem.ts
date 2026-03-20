@@ -42,7 +42,7 @@ const ProblemSchema = new mongoose.Schema(
 
     lastEmailSentDate: { type: Date, default: null },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // COMPOUND INDEXES — Very Important
