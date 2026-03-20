@@ -88,10 +88,10 @@ const handler = NextAuth({
         token.githubUsername = account.providerAccountId;
       }
 
-      // ✅ Restore tokens from DB on every request if missing
-      if (token.user?.id) {
+      const userId = (token.user as any)?.id;
+      if (userId) {
         await connectDB();
-        const dbUser = await User.findById((token.user as any).id);
+        const dbUser = await User.findById(userId);
 
         if (!token.accessToken && dbUser?.googleAccessToken) {
           token.accessToken = dbUser.googleAccessToken;
