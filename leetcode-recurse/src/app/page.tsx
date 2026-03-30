@@ -183,136 +183,267 @@ export default function Home() {
 
           {user && (
             <>
-              {/* 🔹 CONNECT GITHUB */}
-              {githubStatus && !githubStatus.isGithubConnected && (
-                <button
-                  className="cursor-pointer"
-                  onClick={() => signIn("github")}
+              <div className="w-full max-w-7xl mx-auto px-6 py-8 space-y-8">
+                <section
+                  className="space-y-4 pb-10 w-full"
+                  id="upcoming-reviews"
                 >
-                  Connect GitHub
-                </button>
-              )}
+                  <h2 className="text-2xl font-semibold text-center">
+                    Problems to Solve This Week
+                  </h2>
 
-              {/* 🔹 INIT REPO */}
-              {githubStatus?.isGithubConnected && !githubStatus?.hasRepo && (
-                <button
-                  onClick={async () => {
-                    try {
-                      const res = await fetch("/api/github/repo-init", {
-                        method: "POST",
-                      });
-
-                      const data = await res.json();
-
-                      if (!res.ok) {
-                        alert(data.error || "Something went wrong");
-                        return;
-                      }
-
-                      alert(data.message);
-
-                      // 🔥 refresh status after init
-                      mutate("/api/github/status");
-                    } catch (err) {
-                      console.error(err);
-                      alert("Failed to initialize repo");
-                    }
-                  }}
-                  className="w-full py-3 text-base font-medium border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 transition cursor-pointer"
-                >
-                  Initialize GitHub Repo
-                </button>
-              )}
-              <section
-                className="space-y-6 pb-14 "
-                id="programmatic-navigation"
-              >
-                <h2 className="text-3xl font-bold text-center">
-                  {" "}
-                  Programmatic Navigation
-                </h2>
-
-                <div className="bg-white dark:bg-zinc-900 shadow-sm border rounded-xl p-6 space-y-3 text-lg">
-                  <p className="cursor-pointer">
-                    Dashboard →{" "}
-                    <Link href="/dashboard">
-                      <code className="text-blue-600">/dashboard</code>
-                    </Link>
-                  </p>
-                  <p>
-                    Add Problem →{" "}
-                    <Link href="/problems">
-                      <code className="text-blue-600">/problems</code>
-                    </Link>
-                  </p>
-
-                  <p>
-                    View Problems →{" "}
-                    <Link href="/view-problems">
-                      <code className="text-blue-600">/view-problems</code>
-                    </Link>
-                  </p>
-                  <p>
-                    Account Settings →{" "}
-                    <Link href="account-settings">
-                      <code className="text-blue-600">/account-settings</code>
-                    </Link>
-                  </p>
-                  <p>
-                    Documentation →{" "}
-                    <Link href="/docs">
-                      <code className="text-blue-600">/docs</code>
-                    </Link>
-                  </p>
-                </div>
-              </section>
-              <section className="space-y-6">
-                <div className="min-h-28 w-full px-4 grid place-items-center">
-                  <div className="w-full max-w-2xl rounded-2xl border border-border bg-background/70 backdrop-blur-md shadow-sm p-6 mt-10">
-                    <Accordion type="single" collapsible className="space-y-4">
-                      <AccordionItem
-                        value="item-1"
-                        className="rounded-xl border border-border bg-card shadow-sm overflow-hidden"
-                      >
-                        <AccordionTrigger className="cursor-pointer px-4 py-3 text-left font-medium text-base transition hover:bg-muted">
-                          How to review a problem
-                        </AccordionTrigger>
-
-                        <AccordionContent className="px-4 pb-4 pt-2 text-sm leading-relaxed text-muted-foreground">
-                          When you open a problem from the View page by clicking
-                          on a particular problem, you’ll see a{" "}
-                          <span className="font-semibold text-foreground">
-                            Review / Solve the problem
-                          </span>{" "}
-                          button.
-                          <br />
-                          <br />
-                          Clicking it means you reviewed the problem, and you’ll
-                          be redirected to the original platform link.
-                          <br />
-                          Anamnesis will then schedule the next review
-                          automatically.
-                          <br />
-                          <br />
-                          <span className="font-medium text-foreground">
-                            Try this after adding your first problem.
-                          </span>
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
+                  <div className="w-full m-auto ">
+                    <UpcomingReviews />
                   </div>
-                </div>
-              </section>
+                </section>
+                {/* two grid layout */}
+                <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+                  {/* LEFT CARD SLOT */}
+                  <div className="h-full min-h-[380px]">
+                    {githubStatus && !githubStatus.isGithubConnected && (
+                      <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-sm p-6 h-full w-full flex flex-col justify-between">
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-11 h-11 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xl">
+                              🐙
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                Connect GitHub
+                              </h3>
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
+                                Link your GitHub account to start saving your
+                                review solutions.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
 
-              <section className="space-y-4 pb-10" id="upcoming-reviews">
-                <h2 className="text-2xl font-semibold text-center">
-                  Problems to Solve This Week
-                </h2>
+                        <Button
+                          className="w-full mt-6 py-5 text-base font-medium border border-gray-300 dark:border-zinc-700 bg-white text-black dark:text-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 transition cursor-pointer"
+                          onClick={() => signIn("github")}
+                        >
+                          Connect GitHub
+                        </Button>
+                      </div>
+                    )}
 
-                <div className="w-full m-auto ">
-                  <UpcomingReviews />
-                </div>
-              </section>
+                    {githubStatus?.isGithubConnected &&
+                      !githubStatus?.hasRepo && (
+                        <div className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-sm p-6 h-full w-full flex flex-col justify-between">
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-11 h-11 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-xl">
+                                📦
+                              </div>
+                              <div>
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                  Initialize GitHub Repo
+                                </h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                  Create your solution repository so Anamnesis
+                                  can store your review attempts.
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+
+                          <Button
+                            onClick={async () => {
+                              try {
+                                const res = await fetch(
+                                  "/api/github/repo-init",
+                                  {
+                                    method: "POST",
+                                  },
+                                );
+
+                                const data = await res.json();
+
+                                if (!res.ok) {
+                                  alert(data.error || "Something went wrong");
+                                  return;
+                                }
+
+                                alert(data.message);
+                                mutate("/api/github/status");
+                              } catch (err) {
+                                console.error(err);
+                                alert("Failed to initialize repo");
+                              }
+                            }}
+                            className="w-full mt-6 py-5 text-base font-medium border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-black dark:text-white hover:bg-gray-50 dark:hover:bg-zinc-800 transition cursor-pointer"
+                          >
+                            Initialize GitHub Repo
+                          </Button>
+                        </div>
+                      )}
+
+                    {githubStatus?.isGithubConnected &&
+                      githubStatus?.hasRepo && (
+                        <div className="bg-white dark:bg-zinc-900 border border-green-200 dark:border-green-900/40 rounded-2xl shadow-sm p-6 h-full w-full flex flex-col justify-between">
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-11 h-11 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                                <svg
+                                  className="w-6 h-6 text-green-600 dark:text-green-400"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2.5"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M5 13l4 4L19 7"
+                                  />
+                                </svg>
+                              </div>
+
+                              <div>
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                  GitHub Ready
+                                </h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                  Your GitHub account is connected and your
+                                  repository is ready.
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="rounded-xl bg-green-50 dark:bg-green-950/20 border border-green-100 dark:border-green-900/30 px-4 py-3">
+                              <p className="text-sm text-green-700 dark:text-green-400">
+                                Future review solutions will now be saved
+                                automatically to your GitHub repo.
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="mt-6 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 flex-wrap">
+                            <span className="inline-flex items-center gap-1">
+                              <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                              Authenticated
+                            </span>
+
+                            <span className="inline-flex items-center gap-1">
+                              <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                              Repository Initialized
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                  </div>
+
+                  {/* RIGHT CARD */}
+                  <div
+                    className="h-full min-h-[380px]"
+                    id="programmatic-navigation"
+                  >
+                    <div className="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800 rounded-2xl p-6 w-full h-full flex flex-col">
+                      <h2 className="text-2xl font-bold text-center mb-6 text-gray-900 dark:text-white">
+                        Programmatic Navigation
+                      </h2>
+
+                      <div className="space-y-4 text-base text-gray-800 dark:text-gray-200">
+                        <p>
+                          Dashboard →{" "}
+                          <Link href="/dashboard">
+                            <code className="text-blue-600 dark:text-blue-400 hover:underline">
+                              /dashboard
+                            </code>
+                          </Link>
+                        </p>
+
+                        <p>
+                          Add Problem →{" "}
+                          <Link href="/problems">
+                            <code className="text-blue-600 dark:text-blue-400 hover:underline">
+                              /problems
+                            </code>
+                          </Link>
+                        </p>
+
+                        <p>
+                          View Problems →{" "}
+                          <Link href="/view-problems">
+                            <code className="text-blue-600 dark:text-blue-400 hover:underline">
+                              /view-problems
+                            </code>
+                          </Link>
+                        </p>
+
+                        <p>
+                          Account Settings →{" "}
+                          <Link href="/account-settings">
+                            <code className="text-blue-600 dark:text-blue-400 hover:underline">
+                              /account-settings
+                            </code>
+                          </Link>
+                        </p>
+
+                        <p>
+                          Documentation →{" "}
+                          <Link href="/docs">
+                            <code className="text-blue-600 dark:text-blue-400 hover:underline">
+                              /docs
+                            </code>
+                          </Link>
+                        </p>
+
+                        <p>
+                          Update Solution →{" "}
+                          <Link href="/review">
+                            <code className="text-blue-600 dark:text-blue-400 hover:underline">
+                              /review
+                            </code>
+                          </Link>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+                <section className="space-y-6 w-full">
+                  <div className="min-h-28 w-full px-4 grid place-items-center">
+                    <div className="w-full rounded-2xl border border-border bg-background/70 backdrop-blur-md shadow-sm p-6 mt-10">
+                      <Accordion
+                        type="single"
+                        collapsible
+                        className="space-y-4"
+                      >
+                        <AccordionItem
+                          value="item-1"
+                          className="rounded-xl border border-border bg-card shadow-sm overflow-hidden"
+                        >
+                          <AccordionTrigger className="cursor-pointer px-4 py-3 text-left font-medium text-base transition hover:bg-muted">
+                            How to review a problem
+                          </AccordionTrigger>
+
+                          <AccordionContent className="px-4 pb-4 pt-2 text-sm leading-relaxed text-muted-foreground">
+                            When you open a problem from the View page by
+                            clicking on a particular problem, you’ll see a{" "}
+                            <span className="font-semibold text-foreground">
+                              Review / Solve the problem
+                            </span>{" "}
+                            button.
+                            <br />
+                            <br />
+                            Clicking it means you reviewed the problem, and
+                            you’ll be redirected to the original platform link.
+                            <br />
+                            Anamnesis will then schedule the next review
+                            automatically.
+                            <br />
+                            <br />
+                            <span className="font-medium text-foreground">
+                              Try this after adding your first problem.
+                            </span>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
+                    </div>
+                  </div>
+                </section>
+              </div>
             </>
           )}
         </div>

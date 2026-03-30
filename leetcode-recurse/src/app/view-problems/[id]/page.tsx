@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import useSWR, { mutate } from "swr";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import ProblemDifficultyStatus from "../ProblemDifficultyStatus";
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const formatDate = (dateStr: string | null | undefined) => {
@@ -140,40 +141,58 @@ export default function ProblemDetails() {
   }
 
   return (
-    <div className="min-h-screen py-12 mt-10 bg-gray-50 dark:bg-[#0d0d0d]">
-      <div className="max-w-4xl mx-auto space-y-10 px-4 relative">
+    <div className="min-h-screen py-10 mt-10 bg-gray-50 dark:bg-[#0d0d0d]">
+      <div className="max-w-5xl mx-auto space-y-8 px-4 relative">
         {/* HEADER */}
-        <div className="bg-white p-8 rounded-2xl border shadow-lg flex justify-between items-center dark:bg-[#161616] dark:border-[#262626] dark:shadow-none">
-          <div>
-            <h1 className="text-4xl font-extrabold text-gray-900 dark:text-[#e5e5e5]">
-              {problem.problemName}
-            </h1>
+        <div className="bg-white dark:bg-[#161616] border border-gray-200 dark:border-[#262626] rounded-3xl shadow-sm p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="">
+                <ProblemDifficultyStatus difficulty={problem.difficulty} />
+              </span>
 
-            <div className="mt-4 flex items-center gap-2 text-gray-600 dark:text-gray-300">
-              <img
-                src={`https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&url=https://${problem.source}&size=32`}
-                className="rounded-md"
-                alt=""
-              />
-              <span className="font-medium">{problem.source}</span>
+              {problem.status === "completed" && (
+                <span className="px-3 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                  Completed
+                </span>
+              )}
+            </div>
+
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-gray-900 dark:text-[#f3f3f3]">
+                {problem.problemName}
+              </h1>
+
+              <div className="mt-4 flex items-center gap-3 text-gray-600 dark:text-gray-300">
+                <img
+                  src={`https://t1.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&url=https://${problem.source}&size=32`}
+                  className="rounded-md w-6 h-6"
+                  alt=""
+                />
+                <span className="font-medium capitalize">{problem.source}</span>
+              </div>
             </div>
           </div>
 
-          <div>
-            {problem.status !== "completed" && (
+          <div className="w-full md:w-auto">
+            {problem.status !== "completed" ? (
               <Button
                 disabled={clicked}
                 onClick={!clicked ? handleReviewed : undefined}
-                className="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50 cursor-pointer"
+                className="w-full md:w-auto px-6 py-6 text-base bg-blue-600 hover:bg-blue-700 text-white rounded-xl disabled:opacity-50 cursor-pointer"
               >
                 {clicked ? "Already clicked →" : "Solve the Problem →"}
               </Button>
+            ) : (
+              <div className="px-4 py-3 rounded-xl border border-green-200 dark:border-green-900/40 bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 text-sm font-medium">
+                Review cycle completed
+              </div>
             )}
           </div>
         </div>
 
         {/* STATS */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <StatCard
             label="Solved On"
             value={formatDate(problem.dateSolved)}
@@ -192,52 +211,82 @@ export default function ProblemDetails() {
         </div>
 
         {/* NOTES */}
-        <div className="bg-white p-8 rounded-2xl border shadow-md dark:bg-[#161616] dark:border-[#262626]">
-          <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-[#e5e5e5]">
-            Notes & Observations
-          </h2>
-          <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line">
-            {problem.notes || "No notes yet."}
-          </p>
+        <div className="bg-white dark:bg-[#161616] border border-gray-200 dark:border-[#262626] rounded-3xl shadow-sm p-8">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-[#f3f3f3]">
+              Notes & Observations
+            </h2>
+          </div>
+
+          <div className="rounded-2xl bg-zinc-50 dark:bg-[#111111] border border-zinc-200 dark:border-[#222] p-5">
+            <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line leading-7">
+              {problem.notes || "No notes yet."}
+            </p>
+          </div>
         </div>
 
         {/* SOLUTIONS */}
-        <div className="bg-white p-8 rounded-2xl border shadow-md dark:bg-[#161616] dark:border-[#262626]">
-          <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-[#e5e5e5]">
-            Your Solutions
-          </h2>
+        <div className="bg-white dark:bg-[#161616] border border-gray-200 dark:border-[#262626] rounded-3xl shadow-sm p-8">
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-[#f3f3f3]">
+              Your Solutions
+            </h2>
+
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {solutions.length} saved review{solutions.length !== 1 ? "s" : ""}
+            </span>
+          </div>
 
           {loadingSolutions ? (
-            <p className="text-gray-500">Loading solutions...</p>
+            <div className="rounded-2xl border border-dashed border-gray-300 dark:border-[#333] p-6 text-gray-500 dark:text-gray-400 text-center">
+              Loading solutions...
+            </div>
           ) : solutions.length === 0 ? (
-            <p className="text-gray-500">No solutions yet.</p>
+            <div className="rounded-2xl border border-dashed border-gray-300 dark:border-[#333] p-6 text-gray-500 dark:text-gray-400 text-center">
+              No saved solutions yet.
+            </div>
           ) : (
             <div className="space-y-4">
               {solutions.map((sol: any) => (
                 <div
                   key={sol.review}
-                  className="border rounded-lg p-4 dark:border-[#333]"
+                  className="border border-gray-200 dark:border-[#2a2a2a] rounded-2xl overflow-hidden bg-zinc-50 dark:bg-[#111111]"
                 >
-                  <button
-                    onClick={() => toggleSolution(sol.review)}
-                    className="text-blue-600 hover:underline font-medium"
-                  >
-                    {visibleSolutions[sol.review]
-                      ? `Hide Solution Review ${sol.review}`
-                      : `Show Solution Review ${sol.review}`}
-                  </button>
+                  <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-[#222]">
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <span className="font-medium text-gray-900 dark:text-white">
+                        Review {sol.review}
+                      </span>
+
+                      <span className="px-2.5 py-1 text-xs rounded-full bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 uppercase">
+                        {sol.language}
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => toggleSolution(sol.review)}
+                      className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+                    >
+                      {visibleSolutions[sol.review] ? "Hide Code" : "Show Code"}
+                    </button>
+                  </div>
 
                   {visibleSolutions[sol.review] && (
-                    // <pre className="mt-4 bg-black text-green-400 p-4 rounded overflow-x-auto text-sm">
-                    //   <code>{sol.code}</code>
-                    // </pre>
-                    <SyntaxHighlighter
-                      language={sol.language}
-                      style={oneDark}
-                      className="mt-4 rounded text-sm"
-                    >
-                      {sol.code}
-                    </SyntaxHighlighter>
+                    <div className="p-4">
+                      <SyntaxHighlighter
+                        language={sol.language}
+                        style={oneDark}
+                        className=" bg-[#0b0f17]"
+                        customStyle={{
+                          margin: 0,
+                          padding: "1rem",
+                          borderRadius: "1rem",
+                          background: "#0b0f17",
+                        }}
+                      >
+                        {sol.code}
+                      </SyntaxHighlighter>
+                    </div>
                   )}
                 </div>
               ))}
@@ -251,13 +300,17 @@ export default function ProblemDetails() {
 
 function StatCard({ icon: Icon, label, value }: any) {
   return (
-    <div className="bg-white p-6 rounded-xl border shadow-md hover:shadow-xl dark:bg-[#161616] dark:border-[#262626]">
-      <div className="flex flex-col items-center gap-2">
-        <Icon />
-        <p className="text-sm uppercase tracking-wide text-gray-500 dark:text-gray-400">
+    <div className="bg-white dark:bg-[#161616] border border-gray-200 dark:border-[#262626] rounded-2xl shadow-sm p-6 hover:shadow-md transition">
+      <div className="flex flex-col items-center gap-3 text-center">
+        <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+          <Icon className="w-5 h-5" />
+        </div>
+
+        <p className="text-xs uppercase tracking-[0.18em] text-gray-500 dark:text-gray-400">
           {label}
         </p>
-        <p className="text-2xl font-bold text-gray-900 dark:text-[#e5e5e5]">
+
+        <p className="text-2xl font-bold text-gray-900 dark:text-[#f3f3f3]">
           {value}
         </p>
       </div>

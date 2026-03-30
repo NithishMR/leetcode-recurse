@@ -3,6 +3,11 @@ import Problem from "@/database/Problem";
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
+function getReviewStage(timesSolved: number) {
+  if (timesSolved === 0) return "Initial Solve";
+  return `Review ${timesSolved}`;
+}
+
 export async function GET(req: NextRequest) {
   try {
     // ==========================
@@ -25,30 +30,38 @@ export async function GET(req: NextRequest) {
     // 2️⃣ TODAY RANGE
     // ==========================
     const today = new Date();
-
-    // start of today
-    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-
-    // end of today
-    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
 
     // ==========================
-    // 3️⃣ FETCH PROBLEMS
+    // 3️⃣ FETCH DUE PROBLEMS
     // ==========================
     const problems = await Problem.find({
       userId,
       status: { $ne: "completed" },
-      nextReviewDate: {
-        $lte: endOfDay,
-      },
+      nextReviewDate: { $lte: endOfDay },
+      timesSolved: { $lt: 4 }, // extra safety
     })
-      .select("_id problemName source difficulty nextReviewDate")
+      .select("_id problemName source difficulty nextReviewDate timesSolved")
       .sort({ nextReviewDate: 1 });
+    // console.log("problems:", problems);
+    // ==========================
+    // 4ADD REVIEW STAGE
+    // ==========================
+    const formattedProblems = problems.map((problem) => ({
+      _id: problem._id,
+      problemName: problem.problemName,
+      source: problem.source,
+      difficulty: problem.difficulty,
+      nextReviewDate: problem.nextReviewDate,
+      timesSolved: problem.timesSolved,
+      reviewStage: getReviewStage(problem.timesSolved),
+    }));
 
     // ==========================
-    // 4️⃣ RESPONSE
+    // 5️⃣ RESPONSE
     // ==========================
-    return NextResponse.json({ reviews: problems }, { status: 200 });
+    return NextResponse.json({ reviews: formattedProblems }, { status: 200 });
   } catch (error) {
     console.error("Upcoming reviews error:", error);
 

@@ -96,7 +96,7 @@ export default function Navbar() {
               href="/review"
               className="hover:text-blue-600 dark:hover:text-blue-400"
             >
-              Review
+              Update Solution
             </Link>
           </div>
           <div className="">

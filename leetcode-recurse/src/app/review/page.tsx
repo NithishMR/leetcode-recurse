@@ -10,6 +10,8 @@ interface ProblemSchema {
   source: string;
   difficulty: string;
   nextReviewDate: string;
+  timesSolved: number;
+  reviewStage: string;
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -28,7 +30,7 @@ export default function UpcomingReviews() {
   if (isLoading) {
     return (
       <div className="p-6 text-center text-gray-500 dark:text-gray-400">
-        Loading upcoming reviews...
+        Loading problems to solve...
       </div>
     );
   }
@@ -36,7 +38,7 @@ export default function UpcomingReviews() {
   if (error) {
     return (
       <div className="p-6 text-center text-red-500">
-        Failed to load upcoming reviews.
+        Failed to load problems.
       </div>
     );
   }
@@ -46,7 +48,7 @@ export default function UpcomingReviews() {
   if (upcoming.length === 0) {
     return (
       <div className="p-6 text-center italic text-gray-400 dark:text-gray-500 mt-36">
-        No problem to be done today 🎉
+        No problems to solve today 🎉
       </div>
     );
   }
@@ -62,22 +64,18 @@ export default function UpcomingReviews() {
       "
     >
       <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-[#e5e5e5]">
-        Reviews to be done today
+        Problems to Solve Today
       </h2>
 
       <div className="divide-y divide-gray-200 dark:divide-[#262626]">
         {upcoming.map((problem) => {
-          const daysLeft = Math.ceil(
+          const daysDiff = Math.floor(
             (new Date(problem.nextReviewDate).getTime() - Date.now()) /
               (1000 * 60 * 60 * 24),
           );
 
-          const urgencyColor =
-            daysLeft <= 2
-              ? "text-green-600 dark:text-green-400"
-              : daysLeft <= 5
-                ? "text-yellow-600 dark:text-yellow-400"
-                : "text-red-600 dark:text-red-400";
+          const isOverdue = daysDiff < 0;
+          const isToday = daysDiff === 0;
 
           const difficultyColor =
             problem.difficulty === "easy"
@@ -86,73 +84,61 @@ export default function UpcomingReviews() {
                 ? "text-yellow-700 dark:text-yellow-400"
                 : "text-red-700 dark:text-red-400";
 
-          return (
-            <Link key={problem._id} href={`/view-problems/${problem._id}`}>
-              <div
-                className="
-                  flex justify-between items-center
-                  py-3 px-2 rounded-lg
-                  transition
+          const badgeStyle = isOverdue
+            ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+            : isToday
+              ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+              : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
 
-                  hover:bg-gray-50
-                  dark:hover:bg-[#1f1f1f]
-                "
-              >
-                {/* LEFT */}
-                <div className="flex flex-col">
-                  <span className="font-medium text-gray-900 dark:text-[#e5e5e5]">
+          return (
+            <div
+              key={problem._id}
+              className="
+                flex justify-between items-center
+                py-4 px-2 rounded-lg
+                transition
+                hover:bg-gray-50
+                dark:hover:bg-[#1f1f1f]
+              "
+            >
+              {/* LEFT */}
+              <div className="flex flex-col gap-1">
+                <Link href={`/view-problems/${problem._id}`}>
+                  <span className="font-medium text-gray-900 dark:text-[#e5e5e5] hover:underline cursor-pointer">
                     {problem.problemName}
                   </span>
+                </Link>
 
-                  <span className="text-sm text-gray-500 dark:text-gray-400 capitalize">
-                    {problem.source} •{" "}
-                    <span className={difficultyColor}>
-                      {problem.difficulty}
-                    </span>
+                <span className="text-sm text-gray-500 dark:text-gray-400 capitalize">
+                  {problem.source} •{" "}
+                  <span className={difficultyColor}>{problem.difficulty}</span>
+                </span>
+
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                  <span className="text-xs px-2 py-1 rounded-full bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                    {problem.reviewStage}
+                  </span>
+
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full ${badgeStyle}`}
+                  >
+                    {isOverdue ? "Overdue" : isToday ? "Due Today" : "Upcoming"}
                   </span>
                 </div>
-
-                {/* RIGHT */}
-                <div className="text-right">
-                  {/* <p className={`font-semibold ${urgencyColor}`}>
-                    {daysLeft === 0
-                      ? "Today"
-                      : daysLeft === 1
-                        ? "1 day left"
-                        : `${daysLeft} days left`}
-                  </p>
-
-                  <p className="text-xs text-gray-400 dark:text-gray-500">
-                    {new Date(problem.nextReviewDate).toLocaleDateString(
-                      "en-US",
-                      {
-                        month: "short",
-                        day: "numeric",
-                      },
-                    )}
-                  </p> */}
-                  <Button variant={"link"} className="cursor-pointer">
-                    <Link href={`/review/${problem._id}`}>
-                      Update Solution for the review
-                    </Link>
-                  </Button>
-                </div>
               </div>
-            </Link>
+
+              {/* RIGHT */}
+              <div className="text-right">
+                <Link href={`/review/${problem._id}`}>
+                  <Button variant="link" className="cursor-pointer">
+                    Update Solution
+                  </Button>
+                </Link>
+              </div>
+            </div>
           );
         })}
       </div>
-
-      {/* <div className="flex justify-center mt-4">
-        <Link href="/dashboard/upcoming-reviews">
-          <Button
-            variant="link"
-            className="text-blue-600 dark:text-blue-400 cursor-pointer"
-          >
-            See all upcoming problems
-          </Button>
-        </Link>
-      </div> */}
     </div>
   );
 }
