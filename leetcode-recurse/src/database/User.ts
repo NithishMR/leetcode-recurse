@@ -9,13 +9,11 @@ const UserSchema = new mongoose.Schema(
 
     provider: { type: String },
     providerAccountId: { type: String },
+
     wantEmailReminder: { type: Boolean, default: true },
     wantCalendarReminder: { type: Boolean, default: false },
     lastEmailSentDate: { type: Date, default: null },
     googleAccessToken: { type: String, default: null },
-    githubAccessToken: { type: String, default: null },
-    githubUsername: { type: String, default: null },
-    repoName: { type: String, default: null },
   },
   { timestamps: true },
 );

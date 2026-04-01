@@ -1,7 +1,19 @@
-import { connectDB } from "@/database/connection";
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
-import User from "@/database/User";
+
+// 🔥 helper (move later to utils/github.ts)
+function sanitizeProblemName(problemName: string) {
+  return problemName
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-");
+}
+
+function getProblemFolder(userId: string, problemName: string) {
+  const safeName = sanitizeProblemName(problemName);
+  return `data/${userId}/leetcode/${safeName}`;
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -17,47 +29,36 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // ==========================
-    // 2️⃣ DB + USER
-    // ==========================
-    await connectDB();
+    const userId = token.user.id;
 
-    const user = await User.findById(token.user.id);
-    // console.log("user: ", user);
-    if (!user?.githubAccessToken || !user?.githubUsername) {
-      return NextResponse.json(
-        { error: "GitHub not connected" },
-        { status: 400 },
-      );
-    }
-
-    const { githubAccessToken, githubUsername } = user;
-    const repoName = user.repoName || "anamnesis";
+    // ==========================
+    // 2️⃣ ENV (CENTRAL GITHUB)
+    // ==========================
+    const githubAccessToken = process.env.GITHUB_PAT!;
+    const githubUsername = process.env.GITHUB_OWNER!;
+    const repoName = process.env.GITHUB_REPO!;
 
     // ==========================
     // 3️⃣ GET QUERY PARAM
     // ==========================
     const { searchParams } = new URL(req.url);
-    const problemName = searchParams.get("problemName");
-    // console.log(
-    //   "searchParams:",
-    //   searchParams,
-    //   " githubaccesstoken :",
-    //   githubAccessToken,
-    // );
-    if (!problemName) {
+    const rawProblemName = searchParams.get("problemName");
+
+    if (!rawProblemName) {
       return NextResponse.json(
         { error: "Missing problemName" },
         { status: 400 },
       );
     }
 
+    const safeProblemName = sanitizeProblemName(rawProblemName);
+    const baseFolder = getProblemFolder(userId, safeProblemName);
+    const metadataPath = `${baseFolder}/metadata.json`;
+
     const headers = {
       Authorization: `Bearer ${githubAccessToken}`,
       Accept: "application/vnd.github+json",
     };
-
-    const metadataPath = `leetcode/${problemName}/metadata.json`;
 
     // ==========================
     // 4️⃣ FETCH METADATA
@@ -83,7 +84,7 @@ export async function GET(req: NextRequest) {
     // ==========================
     const solutions = await Promise.all(
       metadata.map(async (item: any) => {
-        const filePath = `leetcode/${problemName}/${item.file}`;
+        const filePath = `${baseFolder}/${item.file}`;
 
         const fileRes = await fetch(
           `https://api.github.com/repos/${githubUsername}/${repoName}/contents/${filePath}`,
@@ -95,7 +96,6 @@ export async function GET(req: NextRequest) {
         }
 
         const fileData = await fileRes.json();
-
         const decodedCode = Buffer.from(fileData.content, "base64").toString();
 
         return {
@@ -107,14 +107,13 @@ export async function GET(req: NextRequest) {
         };
       }),
     );
-    // console.log("solutions: ", solutions);
-    // remove nulls
+
     const validSolutions = solutions
       .filter(Boolean)
       .sort((a: any, b: any) => a.review - b.review);
 
     // ==========================
-    // ✅ SUCCESS
+    // SUCCESS
     // ==========================
     return NextResponse.json(validSolutions, { status: 200 });
   } catch (error) {

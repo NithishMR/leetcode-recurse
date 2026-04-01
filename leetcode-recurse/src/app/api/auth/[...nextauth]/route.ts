@@ -2,7 +2,6 @@
 
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import GitHubProvider from "next-auth/providers/github";
 import { connectDB } from "@/database/connection";
 import User from "@/database/User";
 import { sendWelcomeMailToNewUser } from "@/utils/newUserMail";
@@ -16,15 +15,6 @@ const handler = NextAuth({
         params: {
           scope:
             "openid email profile https://www.googleapis.com/auth/calendar.events",
-        },
-      },
-    }),
-    GitHubProvider({
-      clientId: process.env.GITHUB_ID!,
-      clientSecret: process.env.GITHUB_SECRET!,
-      authorization: {
-        params: {
-          scope: "read:user user:email repo",
         },
       },
     }),
@@ -51,22 +41,15 @@ const handler = NextAuth({
           to: existingUser.email,
           username: existingUser.name,
         }).catch((err) => console.error("Welcome mail failed:", err));
+      } else {
+        // Optional: keep user info fresh on sign in
+        existingUser.name = user.name || existingUser.name;
+        existingUser.image = user.image || existingUser.image;
       }
 
-      // ✅ Save Google token to DB
+      //  Save Google access token for Calendar usage
       if (account?.provider === "google") {
         existingUser.googleAccessToken = account.access_token;
-        await existingUser.save();
-      }
-
-      // ✅ Save GitHub token to DB (unchanged)
-      if (account?.provider === "github") {
-        const res = await fetch("https://api.github.com/user", {
-          headers: { Authorization: `Bearer ${account.access_token}` },
-        });
-        const githubData = await res.json();
-        existingUser.githubAccessToken = account.access_token;
-        existingUser.githubUsername = githubData.login;
         await existingUser.save();
       }
 
@@ -75,19 +58,17 @@ const handler = NextAuth({
     },
 
     async jwt({ token, user, account }) {
+      // Store user object in JWT
       if (user) {
         token.user = user;
       }
 
+      // Save Google token at sign-in time
       if (account?.provider === "google") {
         token.accessToken = account.access_token;
       }
 
-      if (account?.provider === "github") {
-        token.githubAccessToken = account.access_token;
-        token.githubUsername = account.providerAccountId;
-      }
-
+      // Restore Google token from DB if missing
       const userId = (token.user as any)?.id;
       if (userId) {
         await connectDB();
@@ -96,18 +77,14 @@ const handler = NextAuth({
         if (!token.accessToken && dbUser?.googleAccessToken) {
           token.accessToken = dbUser.googleAccessToken;
         }
-
-        if (!token.githubAccessToken && dbUser?.githubAccessToken) {
-          token.githubAccessToken = dbUser.githubAccessToken;
-        }
       }
 
       return token;
     },
 
     async session({ session, token }) {
-      // Pass data to client session
       session.user = token.user as any;
+      (session as any).accessToken = token.accessToken;
       return session;
     },
   },

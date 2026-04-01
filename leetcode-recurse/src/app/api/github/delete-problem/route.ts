@@ -1,14 +1,18 @@
-import { connectDB } from "@/database/connection";
-import User from "@/database/User";
-import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
+// 🔥 helper (move later to utils/github.ts)
 function sanitizeProblemName(problemName: string) {
   return problemName
     .toLowerCase()
     .trim()
     .replace(/[^\w\s-]/g, "")
     .replace(/\s+/g, "-");
+}
+
+function getProblemFolder(userId: string, problemName: string) {
+  const safeName = sanitizeProblemName(problemName);
+  return `data/${userId}/leetcode/${safeName}`;
 }
 
 export async function POST(req: NextRequest) {
@@ -25,6 +29,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const userId = token.user.id;
+
+    // ==========================
+    // 2️⃣ BODY
+    // ==========================
     const { problemName } = await req.json();
 
     if (!problemName) {
@@ -34,41 +43,35 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await connectDB();
+    // ==========================
+    // 3️⃣ ENV (CENTRAL GITHUB)
+    // ==========================
+    const githubAccessToken = process.env.GITHUB_PAT!;
+    const githubUsername = process.env.GITHUB_OWNER!;
+    const repoName = process.env.GITHUB_REPO!;
 
-    const user = await User.findById(token.user.id);
-
-    if (!user?.githubAccessToken || !user?.githubUsername || !user?.repoName) {
-      return NextResponse.json(
-        { error: "GitHub not connected or repo not initialized" },
-        { status: 400 },
-      );
-    }
-
-    const { githubAccessToken, githubUsername, repoName } = user;
+    const headers = {
+      Authorization: `Bearer ${githubAccessToken}`,
+      Accept: "application/vnd.github+json",
+      "Content-Type": "application/json",
+    };
 
     // ==========================
-    // 2️⃣ BUILD FOLDER PATH
+    // 4️⃣ BUILD FOLDER PATH
     // ==========================
-    const safeProblemName = sanitizeProblemName(problemName);
-    const folderPath = `leetcode/${safeProblemName}`;
+    const folderPath = getProblemFolder(userId, problemName);
 
     // ==========================
-    // 3️⃣ LIST FILES IN FOLDER
+    // 5️⃣ LIST FILES
     // ==========================
     const contentsRes = await fetch(
       `https://api.github.com/repos/${githubUsername}/${repoName}/contents/${folderPath}`,
-      {
-        headers: {
-          Authorization: `Bearer ${githubAccessToken}`,
-          Accept: "application/vnd.github+json",
-        },
-      },
+      { headers },
     );
 
     if (contentsRes.status === 404) {
       return NextResponse.json(
-        { message: "GitHub folder not found, nothing to delete" },
+        { message: "Folder not found, nothing to delete" },
         { status: 200 },
       );
     }
@@ -87,24 +90,20 @@ export async function POST(req: NextRequest) {
 
     if (!Array.isArray(files) || files.length === 0) {
       return NextResponse.json(
-        { message: "No files found in GitHub folder" },
+        { message: "No files found in folder" },
         { status: 200 },
       );
     }
 
     // ==========================
-    // 4️⃣ DELETE FILES ONE BY ONE
+    // 6️⃣ DELETE FILES
     // ==========================
     for (const file of files) {
       const deleteRes = await fetch(
         `https://api.github.com/repos/${githubUsername}/${repoName}/contents/${file.path}`,
         {
           method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${githubAccessToken}`,
-            Accept: "application/vnd.github+json",
-            "Content-Type": "application/json",
-          },
+          headers,
           body: JSON.stringify({
             message: `Delete ${file.name} for problem ${problemName}`,
             sha: file.sha,
@@ -117,21 +116,24 @@ export async function POST(req: NextRequest) {
         console.error(`Failed to delete file ${file.path}:`, err);
 
         return NextResponse.json(
-          { error: `Failed to delete file ${file.name} from GitHub` },
+          { error: `Failed to delete ${file.name}` },
           { status: 500 },
         );
       }
     }
 
+    // ==========================
+    //  SUCCESS
+    // ==========================
     return NextResponse.json(
-      { message: "Problem folder deleted from GitHub successfully" },
+      { message: "Problem folder deleted successfully" },
       { status: 200 },
     );
   } catch (error) {
-    console.error("GitHub delete problem error:", error);
+    console.error("Delete route error:", error);
 
     return NextResponse.json(
-      { error: "Failed to delete problem from GitHub" },
+      { error: "Failed to delete problem folder" },
       { status: 500 },
     );
   }

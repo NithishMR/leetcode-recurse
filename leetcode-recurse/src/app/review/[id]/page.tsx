@@ -78,7 +78,14 @@ export default function UpdateProblemSolution() {
     }
   };
 
-  if (loading) return <div className="mt-20">Loading...</div>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-black">
+        <p className="text-xl font-medium text-gray-700 dark:text-white">
+          Loading problem ...
+        </p>
+      </div>
+    );
 
   return (
     <div className="mt-20 px-6 max-w-3xl mx-auto">

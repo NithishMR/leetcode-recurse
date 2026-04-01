@@ -1,7 +1,20 @@
 import { connectDB } from "@/database/connection";
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
-import User from "@/database/User";
+
+// 🔥 helper (you can move this later to utils/github.ts)
+function sanitizeProblemName(problemName: string) {
+  return problemName
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-");
+}
+
+function getProblemFolder(userId: string, problemName: string) {
+  const safeName = sanitizeProblemName(problemName);
+  return `data/${userId}/leetcode/${safeName}`;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,32 +30,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // ==========================
-    // 2️⃣ DB + USER
-    // ==========================
-    await connectDB();
-
-    const user = await User.findById(token.user.id);
-
-    if (!user?.githubAccessToken || !user?.githubUsername) {
-      return NextResponse.json(
-        { error: "GitHub not connected" },
-        { status: 400 },
-      );
-    }
-
-    const { githubAccessToken, githubUsername } = user;
-    const repoName = user.repoName || "anamnesis";
+    const userId = token.user.id;
 
     // ==========================
-    // 3️⃣ BODY
+    // 2️⃣ BODY
     // ==========================
-    console.log("body reached");
     const { problemName, reviewCount, code, language } = await req.json();
 
     if (!problemName || !reviewCount || !code || !language) {
       return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
+
+    // ==========================
+    // 3️⃣ ENV (CENTRAL GITHUB)
+    // ==========================
+    const githubAccessToken = process.env.GITHUB_PAT!;
+    const githubUsername = process.env.GITHUB_OWNER!;
+    const repoName = process.env.GITHUB_REPO!;
 
     // ==========================
     // 4️⃣ FILE PREP
@@ -52,22 +56,25 @@ export async function POST(req: NextRequest) {
       python: "py",
       cpp: "cpp",
       javascript: "js",
-      csharp: ".cs",
-      typescript: ".ts",
-      go: ".go",
-      rust: ".rs",
-      kotlin: ".kt",
-      swift: ".swift",
+      typescript: "ts",
+      csharp: "cs",
+      go: "go",
+      rust: "rs",
+      kotlin: "kt",
+      swift: "swift",
     };
 
-    const extension = extensionMap[language];
+    const extension = extensionMap[language] || "txt";
 
-    const safeProblemName = problemName.toLowerCase().replace(/\s+/g, "-");
+    const safeProblemName = sanitizeProblemName(problemName);
 
     const fileName = `${safeProblemName}_review${reviewCount}.${extension}`;
 
-    const solutionPath = `leetcode/${safeProblemName}/${fileName}`;
-    const metadataPath = `leetcode/${safeProblemName}/metadata.json`;
+    // 🔥 NEW PATH (WITH USERID)
+    const baseFolder = getProblemFolder(userId, problemName);
+
+    const solutionPath = `${baseFolder}/${fileName}`;
+    const metadataPath = `${baseFolder}/metadata.json`;
 
     const headers = {
       Authorization: `Bearer ${githubAccessToken}`,
@@ -80,7 +87,6 @@ export async function POST(req: NextRequest) {
     // ==========================
     const encodedCode = Buffer.from(code).toString("base64");
 
-    // 🔹 Check if file already exists (to get SHA)
     let existingSolutionSha = null;
 
     const existingFileRes = await fetch(
@@ -89,7 +95,6 @@ export async function POST(req: NextRequest) {
     );
 
     if (existingFileRes.ok) {
-      console.log("existing files res reached");
       const existingData = await existingFileRes.json();
       existingSolutionSha = existingData.sha;
     }
@@ -108,7 +113,7 @@ export async function POST(req: NextRequest) {
     );
 
     const solutionData = await solutionRes.json();
-    console.log("solution data", solutionData);
+
     if (!solutionRes.ok) {
       console.error("Solution push failed:", solutionData);
       return NextResponse.json(
@@ -120,8 +125,7 @@ export async function POST(req: NextRequest) {
     // ==========================
     // 6️⃣ METADATA
     // ==========================
-    let metadata = [];
-
+    let metadata: any[] = [];
     let metadataSha = null;
 
     const metadataRes = await fetch(
@@ -137,7 +141,6 @@ export async function POST(req: NextRequest) {
       metadataSha = existing.sha;
     }
 
-    // add new entry
     metadata.push({
       review: reviewCount,
       file: fileName,
