@@ -52,6 +52,12 @@ export async function POST(req: NextRequest) {
       python: "py",
       cpp: "cpp",
       javascript: "js",
+      csharp: ".cs",
+      typescript: ".ts",
+      go: ".go",
+      rust: ".rs",
+      kotlin: ".kt",
+      swift: ".swift",
     };
 
     const extension = extensionMap[language];

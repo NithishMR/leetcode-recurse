@@ -67,12 +67,12 @@ export default function UpdateProblemSolution() {
         throw new Error(data.error || "GitHub push failed");
       }
 
-      alert("✅ Solution pushed to GitHub!");
+      alert("Solution pushed to GitHub!");
 
       setCode("");
     } catch (err) {
       console.error(err);
-      alert("❌ Failed to push solution");
+      alert("Failed to push solution");
     } finally {
       setSubmitting(false);
     }
@@ -97,6 +97,12 @@ export default function UpdateProblemSolution() {
         <option value="python">Python</option>
         <option value="cpp">C++</option>
         <option value="javascript">JavaScript</option>
+        <option value="typescript">Typescript</option>
+        <option value="csharp">C#</option>
+        <option value="go">Go</option>
+        <option value="rust">Rust</option>
+        <option value="kotlin">Kotlin</option>
+        <option value="swift">Swift</option>
       </select>
 
       {/* 🔹 Code Input */}

@@ -101,22 +101,44 @@ function ProblemsViewPage() {
   const handleProblemDelete = async (_id: string) => {
     await toast.promise(
       async () => {
+        // ==========================
+        // 1️⃣ DELETE FROM DB
+        // ==========================
         const res = await fetch(`/api/problems`, {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ _id }),
         });
 
-        if (!res.ok) throw new Error("Failed to delete");
+        if (!res.ok) throw new Error("Failed to delete from database");
 
         const result = await res.json();
-        console.log("Problem deleted:", result);
+        console.log("Problem deleted from DB:", result);
+        // console.log(result);
+        // ==========================
+        // 2️⃣ DELETE FROM GITHUB
+        // ==========================
+        const githubRes = await fetch(`/api/github/delete-problem`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            problemName: result?.deleted?.problemName,
+          }),
+        });
+
+        if (!githubRes.ok) {
+          console.warn("GitHub delete failed");
+        }
+
+        // ==========================
+        // 3️⃣ REFRESH SWR
+        // ==========================
         mutate("/api/dashboard/summary");
         mutate("/api/dashboard/weekly-progress");
         mutate("/api/dashboard/upcoming-reviews");
         mutate("/api/dashboard/recent-activity");
+        mutate("/api/problems/all");
 
-        // router.refresh(); // refresh UI
         return result;
       },
       {

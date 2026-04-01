@@ -5,7 +5,10 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import useSWR, { mutate } from "swr";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import {
+  oneDark,
+  vscDarkPlus,
+} from "react-syntax-highlighter/dist/esm/styles/prism";
 import ProblemDifficultyStatus from "../ProblemDifficultyStatus";
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -275,7 +278,7 @@ export default function ProblemDetails() {
                     <div className="p-4">
                       <SyntaxHighlighter
                         language={sol.language}
-                        style={oneDark}
+                        style={vscDarkPlus}
                         className=" bg-[#0b0f17]"
                         customStyle={{
                           margin: 0,

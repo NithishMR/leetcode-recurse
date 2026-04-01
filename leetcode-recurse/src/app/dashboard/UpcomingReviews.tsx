@@ -22,7 +22,7 @@ export default function UpcomingReviews() {
       dedupingInterval: 1000 * 60 * 5,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-    }
+    },
   );
 
   if (isLoading) {
@@ -68,7 +68,7 @@ export default function UpcomingReviews() {
         {upcoming.map((problem) => {
           const daysLeft = Math.ceil(
             (new Date(problem.nextReviewDate).getTime() - Date.now()) /
-              (1000 * 60 * 60 * 24)
+              (1000 * 60 * 60 * 24),
           );
 
           const getColor = () => {
@@ -102,8 +102,8 @@ export default function UpcomingReviews() {
                         problem.difficulty === "easy"
                           ? "text-green-700 dark:text-green-400"
                           : problem.difficulty === "medium"
-                          ? "text-yellow-700 dark:text-yellow-400"
-                          : "text-red-700 dark:text-red-400"
+                            ? "text-yellow-700 dark:text-yellow-400"
+                            : "text-red-700 dark:text-red-400"
                       }
                     >
                       {problem.difficulty}
@@ -117,8 +117,8 @@ export default function UpcomingReviews() {
                     {daysLeft === 0
                       ? "Today"
                       : daysLeft === 1
-                      ? "1 day left"
-                      : `${daysLeft} days left`}
+                        ? "1 day left"
+                        : `${daysLeft} days left`}
                   </p>
 
                   <p className="text-xs text-gray-400 dark:text-gray-500">
@@ -127,7 +127,7 @@ export default function UpcomingReviews() {
                       {
                         month: "short",
                         day: "numeric",
-                      }
+                      },
                     )}
                   </p>
                 </div>

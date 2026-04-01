@@ -92,12 +92,6 @@ export default function Navbar() {
             >
               Settings
             </Link>
-            <Link
-              href="/review"
-              className="hover:text-blue-600 dark:hover:text-blue-400"
-            >
-              Update Solution
-            </Link>
           </div>
           <div className="">
             <ThemeSetter />

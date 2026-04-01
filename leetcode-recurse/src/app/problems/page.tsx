@@ -17,7 +17,7 @@ export default function ProblemsEntryPage() {
         </div>
 
         {/* Add by URL (Primary) */}
-        <div className="border border-gray-200 dark:border-[#262626] dark:bg-[#161616]">
+        {/* <div className="border border-gray-200 dark:border-[#262626] dark:bg-[#161616]">
           <div className="p-5 space-y-4">
             <div className="flex items-start gap-3 relative">
               <div
@@ -53,7 +53,7 @@ export default function ProblemsEntryPage() {
               </Link>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Add manually (Secondary) */}
         <div className="border border-gray-200 dark:border-[#262626] dark:bg-[#161616]">

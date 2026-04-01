@@ -284,7 +284,7 @@ export default function Home() {
                         <div className="bg-white dark:bg-zinc-900 border border-green-200 dark:border-green-900/40 rounded-2xl shadow-sm p-6 h-full w-full flex flex-col justify-between">
                           <div className="space-y-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-11 h-11 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                              <div className="w-12 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
                                 <svg
                                   className="w-6 h-6 text-green-600 dark:text-green-400"
                                   fill="none"
