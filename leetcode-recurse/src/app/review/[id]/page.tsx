@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function UpdateProblemSolution() {
   const { id } = useParams();
@@ -23,7 +24,7 @@ export default function UpdateProblemSolution() {
         const data = await res.json();
 
         setProblemName(data.problemName);
-        setReviewCount(data.timesSolved); // using existing count
+        setReviewCount(data.timesSolved);
       } catch (err) {
         console.error("Error fetching problem:", err);
       } finally {
@@ -34,7 +35,7 @@ export default function UpdateProblemSolution() {
     fetchProblem();
   }, [id]);
 
-  // 🔹 Handle submit (ONLY GitHub)
+  // 🔹 Handle submit
   const handleSubmit = async () => {
     if (!problemName || reviewCount === null || !code) {
       alert("Fill all fields");
@@ -44,7 +45,6 @@ export default function UpdateProblemSolution() {
     setSubmitting(true);
 
     try {
-      // sanitize problem name (VERY IMPORTANT)
       const safeProblemName = problemName.toLowerCase().replace(/\s+/g, "-");
 
       const githubRes = await fetch(`/api/github/push-solution`, {
@@ -54,7 +54,7 @@ export default function UpdateProblemSolution() {
         },
         body: JSON.stringify({
           problemName: safeProblemName,
-          reviewCount, // use current count
+          reviewCount,
           code,
           language,
         }),
@@ -68,7 +68,6 @@ export default function UpdateProblemSolution() {
       }
 
       alert("Solution pushed to GitHub!");
-
       setCode("");
     } catch (err) {
       console.error(err);
@@ -78,57 +77,119 @@ export default function UpdateProblemSolution() {
     }
   };
 
-  if (loading)
-    return (
-      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-black">
-        <p className="text-xl font-medium text-gray-700 dark:text-white">
-          Loading problem ...
-        </p>
-      </div>
-    );
-
   return (
-    <div className="mt-20 px-6 max-w-3xl mx-auto">
-      {/* 🔹 Problem Details */}
-      <h1 className="text-2xl font-bold mb-2">{problemName}</h1>
-      <p className="mb-6 text-gray-600">Current Review Count: {reviewCount}</p>
+    <div className="min-h-screen mt-16 bg-gray-50 px-4 py-10 dark:bg-[#0d0d0d]">
+      <div className="mx-auto w-full max-w-3xl">
+        <div className="rounded-2xl border border-gray-200 bg-white p-8 shadow-sm dark:border-[#262626] dark:bg-[#161616]">
+          {/* HEADER */}
+          {loading ? (
+            <div className="space-y-4 mb-8">
+              <Skeleton className="h-8 w-[60%]" />
+              <Skeleton className="h-4 w-[40%]" />
+            </div>
+          ) : (
+            <div className="mb-8">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-[#f3f3f3]">
+                {problemName}
+              </h1>
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Current Review Count:{" "}
+                <span className="font-semibold">{reviewCount}</span>
+              </p>
+            </div>
+          )}
 
-      {/* 🔹 Language Dropdown */}
-      <label className="block mb-2 font-medium">Select Language</label>
-      <select
-        value={language}
-        onChange={(e) => setLanguage(e.target.value)}
-        className="border p-2 mb-4 w-full rounded"
-      >
-        <option value="java">Java</option>
-        <option value="python">Python</option>
-        <option value="cpp">C++</option>
-        <option value="javascript">JavaScript</option>
-        <option value="typescript">Typescript</option>
-        <option value="csharp">C#</option>
-        <option value="go">Go</option>
-        <option value="rust">Rust</option>
-        <option value="kotlin">Kotlin</option>
-        <option value="swift">Swift</option>
-      </select>
+          {/* FORM */}
+          <div className="space-y-6">
+            {/* Language */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Select Language
+              </label>
 
-      {/* 🔹 Code Input */}
-      <label className="block mb-2 font-medium">Your Solution</label>
-      <textarea
-        value={code}
-        onChange={(e) => setCode(e.target.value)}
-        className="border p-3 w-full h-64 mb-4 font-mono rounded"
-        placeholder="Paste your code here..."
-      />
+              {loading ? (
+                <Skeleton className="h-10 w-full rounded-md" />
+              ) : (
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  className="
+                    w-full rounded-md border px-3 py-2 text-sm
+                    bg-white text-gray-800 border-gray-300
+                    focus:outline-none focus:ring-2 focus:ring-blue-500
 
-      {/* 🔹 Submit Button */}
-      <button
-        onClick={handleSubmit}
-        disabled={submitting}
-        className="bg-black text-white px-4 py-2 rounded w-full disabled:opacity-50"
-      >
-        {submitting ? "Submitting..." : "Push to GitHub"}
-      </button>
+                    dark:bg-[#121212]
+                    dark:border-[#262626]
+                    dark:text-gray-200
+                    dark:focus:ring-blue-500
+                  "
+                >
+                  <option value="java">Java</option>
+                  <option value="python">Python</option>
+                  <option value="cpp">C++</option>
+                  <option value="javascript">JavaScript</option>
+                  <option value="typescript">Typescript</option>
+                  <option value="csharp">C#</option>
+                  <option value="go">Go</option>
+                  <option value="rust">Rust</option>
+                  <option value="kotlin">Kotlin</option>
+                  <option value="swift">Swift</option>
+                  <option value="sql">Sql</option>
+                </select>
+              )}
+            </div>
+
+            {/* Code */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Your Solution
+              </label>
+
+              {loading ? (
+                <Skeleton className="h-[250px] w-full rounded-xl" />
+              ) : (
+                <textarea
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="Paste your code here..."
+                  className="
+                    w-full h-64 rounded-xl border p-4 font-mono text-sm
+                    bg-white text-gray-800 border-gray-300
+                    focus:outline-none focus:ring-2 focus:ring-blue-500
+
+                    dark:bg-[#111111]
+                    dark:border-[#262626]
+                    dark:text-gray-200
+                  "
+                />
+              )}
+            </div>
+
+            {/* Submit */}
+            <div>
+              {loading ? (
+                <Skeleton className="h-12 w-full rounded-xl" />
+              ) : (
+                <button
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                  className="
+                    w-full rounded-xl px-4 py-3 text-sm font-medium
+                    bg-blue-600 text-white
+                    hover:bg-blue-700
+                    disabled:opacity-50
+
+                    transition
+                    cursor-pointer
+                  "
+                >
+                  {submitting ? "Submitting..." : "Push to GitHub"}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

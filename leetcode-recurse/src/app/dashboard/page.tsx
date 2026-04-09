@@ -5,6 +5,7 @@ import ProgressOverTime from "./ProgressOverTime";
 import RecentActivityLog from "./RecentActivityLog";
 import UpcomingReviews from "./UpcomingReviews";
 import DifficyltyDistribution from "./DifficultyDistribution";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -14,14 +15,50 @@ export default function Dashboard() {
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
   });
-  if (isLoading)
+  if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-black">
-        <p className="text-xl font-medium text-gray-700 dark:text-white">
-          Loading problem ...
-        </p>
+      <div className="px-6 py-8 mt-10">
+        <h1 className="text-center text-3xl font-bold tracking-tight mb-10">
+          Your Progress & Analytics
+        </h1>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className="rounded-2xl p-6 border bg-white border-gray-200 shadow-md dark:bg-[#161616] dark:border-[#262626] dark:shadow-none"
+            >
+              <Skeleton className="h-4 w-24 mx-auto" />
+              <Skeleton className="h-8 w-16 mx-auto mt-4" />
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
+          {[...Array(2)].map((_, i) => (
+            <div
+              key={i}
+              className="rounded-2xl p-6 border bg-white border-gray-200 shadow-md dark:bg-[#161616] dark:border-[#262626] dark:shadow-none"
+            >
+              <Skeleton className="h-5 w-40 mb-4" />
+              <Skeleton className="h-[220px] w-full rounded-xl" />
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
+          {[...Array(2)].map((_, i) => (
+            <div
+              key={i}
+              className="rounded-2xl p-6 border bg-white border-gray-200 shadow-md dark:bg-[#161616] dark:border-[#262626] dark:shadow-none"
+            >
+              <Skeleton className="h-[180px] w-full rounded-xl" />
+            </div>
+          ))}
+        </div>
       </div>
     );
+  }
   if (error) {
     return (
       <p className="text-center mt-10 text-red-500">
@@ -94,18 +131,7 @@ export default function Dashboard() {
           <UpcomingReviews />
         </div>
 
-        <div
-          className=" rounded-2xl  p-6 border bg-white
-        border-gray-200
-        shadow-md
-        hover:shadow-lg
-        hover:bg-gray-50
-
-        dark:bg-[#161616]
-        dark:border-[#262626]
-        dark:shadow-none
-        dark:hover:bg-[#1f1f1f]"
-        >
+        <div className="">
           {/* <h2 className="text-lg font-semibold mb-4">Recent Activity</h2> */}
           <RecentActivityLog />
         </div>

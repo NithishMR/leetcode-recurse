@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
       rust: "rs",
       kotlin: "kt",
       swift: "swift",
+      sql: "sql",
     };
 
     const extension = extensionMap[language] || "txt";

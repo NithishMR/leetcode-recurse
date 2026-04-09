@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import useSWR from "swr";
 
@@ -113,13 +114,16 @@ export default function RecentActivityLog() {
       dedupingInterval: 1000 * 60 * 5,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-    }
+    },
   );
 
   if (isLoading) {
     return (
-      <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-200 dark:bg-[#161616] dark:border-[#262626] dark:shadow-none">
-        <p className="text-gray-500 dark:text-gray-400">Loading activity...</p>
+      <div className="rounded-2xl p-6 border bg-white border-gray-200 shadow-md dark:bg-[#161616] dark:border-[#262626] dark:shadow-none">
+        <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-[#e5e5e5]">
+          Recent Activity
+        </h2>
+        <Skeleton className="h-60 w-full rounded-xl" />
       </div>
     );
   }

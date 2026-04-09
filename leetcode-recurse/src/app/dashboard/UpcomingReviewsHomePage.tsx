@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import useSWR from "swr";
 
@@ -15,27 +14,25 @@ interface ProblemSchema {
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export default function UpcomingReviews() {
+export default function UpcomingReviewsHomePage() {
   const { data, error, isLoading } = useSWR(
     "/api/dashboard/upcoming-reviews",
     fetcher,
     {
+      suspense: true,
       dedupingInterval: 1000 * 60 * 5,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
     },
   );
 
-  if (isLoading) {
-    return (
-      <div className="">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800 dark:text-[#e5e5e5]">
-          Upcoming Reviews (Next 7 Days)
-        </h2>
-        <Skeleton className="h-60 w-full rounded-xl" />
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="p-6 text-center text-gray-500 dark:text-gray-400">
+  //       Loading upcoming reviews...
+  //     </div>
+  //   );
+  // }
 
   if (error) {
     return (

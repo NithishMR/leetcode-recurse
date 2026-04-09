@@ -85,25 +85,25 @@ const steps: Tour[] = [
         // ✅ no route changes here
       },
 
-      {
-        icon: <>⚡</>,
-        title: "Add a Problem (By URL)",
-        content: (
-          <>
-            Use this option to auto-fill problem details using a link.
-            <br />
-            Currently supported only for LeetCode.
-          </>
-        ),
-        selector: "#automated-problem-entry",
-        side: "left",
-        showControls: true,
-        showSkip: true,
-        pointerPadding: 10,
-        pointerRadius: 10,
-        prevRoute: "/problems",
-        nextRoute: "/view-problems/1",
-      },
+      // {
+      //   icon: <>⚡</>,
+      //   title: "Add a Problem (By URL)",
+      //   content: (
+      //     <>
+      //       Use this option to auto-fill problem details using a link.
+      //       <br />
+      //       Currently supported only for LeetCode.
+      //     </>
+      //   ),
+      //   selector: "#automated-problem-entry",
+      //   side: "left",
+      //   showControls: true,
+      //   showSkip: true,
+      //   pointerPadding: 10,
+      //   pointerRadius: 10,
+      //   prevRoute: "/problems",
+      //   nextRoute: "/view-problems/1",
+      // },
 
       {
         icon: <>🧠</>,

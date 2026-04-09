@@ -113,7 +113,7 @@ export default function RecentActivityLog() {
       dedupingInterval: 1000 * 60 * 5,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-    }
+    },
   );
 
   if (isLoading) {

@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
-import UpcomingReviews from "./dashboard/UpcomingReviews";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import {
@@ -19,7 +18,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useNextStep } from "nextstepjs";
-
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import UpcomingReviewsHomePage from "./dashboard/UpcomingReviewsHomePage";
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Home() {
@@ -191,8 +192,16 @@ export default function Home() {
                         Keep your recall sharp by reviewing problems due today.
                       </p>
                     </div>
-
-                    <UpcomingReviews />
+                    <Suspense
+                      fallback={
+                        <div className="flex flex-col justify-around h-[120px]">
+                          <Skeleton className="h-[50px] w-full" />
+                          <Skeleton className="h-[50px] w-full" />
+                        </div>
+                      }
+                    >
+                      <UpcomingReviewsHomePage />
+                    </Suspense>
                   </div>
                 </section>
 

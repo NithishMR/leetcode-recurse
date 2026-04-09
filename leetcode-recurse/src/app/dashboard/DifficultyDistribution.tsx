@@ -1,5 +1,6 @@
 "use client";
 
+import { Skeleton } from "@/components/ui/skeleton";
 import CustomPieChart from "./CustomPieChart";
 import useSWR from "swr";
 
@@ -13,13 +14,13 @@ export default function DifficultyDistribution() {
       dedupingInterval: 1000 * 60 * 5, // 5 mins cache
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-    }
+    },
   );
 
   if (isLoading)
     return (
-      <div className="p-6 text-center text-gray-500">
-        Loading difficulty distribution...
+      <div className="">
+        <Skeleton className="h-112 w-full rounded-xl" />
       </div>
     );
 

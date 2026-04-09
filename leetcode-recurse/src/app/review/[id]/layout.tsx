@@ -2,7 +2,7 @@
 "use client";
 import { Toaster } from "sonner";
 import React, { ReactNode } from "react";
-import Navbar from "../Navbar";
+import Navbar from "../../Navbar";
 
 // Define the type for the component props
 interface RootLayoutProps {

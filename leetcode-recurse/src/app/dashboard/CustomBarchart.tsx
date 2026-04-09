@@ -11,6 +11,7 @@ import {
   Bar,
   ResponsiveContainer,
 } from "recharts";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type WeeklyData = {
   weekLabel: string;
@@ -34,13 +35,13 @@ export default function CustomBarChart({
       dedupingInterval: 1000 * 60 * 5,
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
-    }
+    },
   );
 
   if (isLoading) {
     return (
-      <div className="p-6 text-center text-gray-500 dark:text-gray-400">
-        Loading progress over time...
+      <div className="">
+        <Skeleton className="h-112 w-full rounded-xl" />
       </div>
     );
   }
@@ -64,20 +65,9 @@ export default function CustomBarChart({
   return (
     <div
       className="
-        bg-white p-6 rounded-2xl border shadow-md
-        hover:shadow-lg hover:bg-gray-50 transition
-
-        dark:bg-[#161616]
-        dark:border-[#262626]
-        dark:shadow-none
-        dark:hover:bg-[#1f1f1f]
       "
     >
-      <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-[#e5e5e5]">
-        Weekly Problem Progress
-      </h2>
-
-      <div className="w-full h-80">
+      <div className="w-full h-80 mt-16">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={data}
