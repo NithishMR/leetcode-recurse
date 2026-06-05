@@ -21,6 +21,7 @@ import { useNextStep } from "nextstepjs";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import UpcomingReviewsHomePage from "./dashboard/UpcomingReviewsHomePage";
+import OverdueReviewsHomePage from "./dashboard/OverdueReviewsHomePage";
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Home() {
@@ -204,7 +205,33 @@ export default function Home() {
                     </Suspense>
                   </div>
                 </section>
+                {/* ===================== */}
+                {/* OVERDUE REVIEWS */}
+                {/* ===================== */}
+                <section className="w-full" id="overdue-reviews">
+                  <div className="bg-white dark:bg-zinc-900 border border-red-200 dark:border-red-900 rounded-2xl shadow-sm p-6">
+                    <div className="mb-5">
+                      <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">
+                        Overdue Reviews
+                      </h2>
 
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                        Problems whose review dates have already passed.
+                      </p>
+                    </div>
+
+                    <Suspense
+                      fallback={
+                        <div className="flex flex-col justify-around h-[120px]">
+                          <Skeleton className="h-[50px] w-full" />
+                          <Skeleton className="h-[50px] w-full" />
+                        </div>
+                      }
+                    >
+                      <OverdueReviewsHomePage />
+                    </Suspense>
+                  </div>
+                </section>
                 {/* ===================== */}
                 {/* BOTTOM 2-COLUMN GRID */}
                 {/* ===================== */}

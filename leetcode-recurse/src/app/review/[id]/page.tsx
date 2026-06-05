@@ -67,7 +67,7 @@ export default function UpdateProblemSolution() {
         throw new Error(data.error || "GitHub push failed");
       }
 
-      alert("Solution pushed to GitHub!");
+      alert("Successfully added your solution!");
       setCode("");
     } catch (err) {
       console.error(err);
@@ -183,7 +183,7 @@ export default function UpdateProblemSolution() {
                     cursor-pointer
                   "
                 >
-                  {submitting ? "Submitting..." : "Push to GitHub"}
+                  {submitting ? "Submitting..." : "Add Solution"}
                 </button>
               )}
             </div>
