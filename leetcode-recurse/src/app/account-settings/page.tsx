@@ -23,6 +23,10 @@ export default function AccountSettings() {
   const [emailReminders, setEmailReminders] = useState<boolean>(true);
   const [calendarReminders, setCalendarReminders] = useState<boolean>(true);
   const [loadingPrefs, setLoadingPrefs] = useState<boolean>(true);
+  // for extension
+  const [extensionToken, setExtensionToken] = useState<string | null>(null);
+  const [loadingToken, setLoadingToken] = useState(true);
+  const [showToken, setShowToken] = useState(false);
 
   // Sync toggle AFTER theme is loaded
   useEffect(() => {
@@ -30,7 +34,29 @@ export default function AccountSettings() {
       setDarkMode(resolvedTheme === "dark");
     }
   }, [resolvedTheme]);
+  // for extension
+  useEffect(() => {
+    const loadExtensionToken = async () => {
+      try {
+        const res = await fetch("/api/user/extension-token");
 
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        setExtensionToken(data.extensionToken);
+      } catch (err) {
+        console.error("Failed to load extension token", err);
+      } finally {
+        setLoadingToken(false);
+      }
+    };
+
+    if (user) {
+      loadExtensionToken();
+    }
+  }, [user]);
+  //
   // ✅ NEW: Load preferences from backend
   useEffect(() => {
     const loadPrefs = async () => {
@@ -70,8 +96,41 @@ export default function AccountSettings() {
       console.error("Failed to update email reminder setting", e);
     }
   };
+  // for extension
+  const handleGenerateToken = async () => {
+    try {
+      const res = await fetch("/api/user/extension-token", {
+        method: "POST",
+      });
 
-  // ✅ NEW: Save calendar toggle
+      if (!res.ok) {
+        throw new Error();
+      }
+
+      const data = await res.json();
+      if (
+        extensionToken &&
+        !window.confirm(
+          "Regenerating your token will disconnect any installed extensions. Continue?",
+        )
+      ) {
+        return;
+      }
+      setExtensionToken(data.extensionToken);
+
+      toast.success(
+        extensionToken
+          ? "Extension token regenerated"
+          : "Extension token generated",
+      );
+    } catch (err) {
+      console.error(err);
+
+      toast.error("Failed to generate extension token");
+    }
+  };
+  //
+  // NEW: Save calendar toggle
   const handleCalendarToggle = async (checked: boolean) => {
     setCalendarReminders(checked);
 
@@ -91,14 +150,14 @@ export default function AccountSettings() {
     await toast.promise<{ name: string }>(
       () =>
         new Promise((resolve) =>
-          setTimeout(() => resolve({ name: user?.name ?? "You" }), 300)
+          setTimeout(() => resolve({ name: user?.name ?? "You" }), 300),
         ),
       {
         loading: "Logging user Out...",
         success: (data) =>
           `${data.name} have been successfully logged out. May take 1 or 2 second to change screen`,
         error: "Error",
-      }
+      },
     );
   };
 
@@ -162,6 +221,61 @@ export default function AccountSettings() {
 
         <Separator />
 
+        <section className="space-y-6">
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+            Extension Integration
+          </h2>
+
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Connect the Anamnesis browser extension using a personal extension
+            token.
+          </p>
+
+          <div className="space-y-2">
+            <Label>Extension Token</Label>
+
+            <Input
+              readOnly
+              value={
+                loadingToken
+                  ? "Loading..."
+                  : extensionToken
+                    ? showToken
+                      ? extensionToken
+                      : "•".repeat(64)
+                    : "No token generated"
+              }
+            />
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {extensionToken && (
+              <Button
+                variant="outline"
+                onClick={() => setShowToken((prev) => !prev)}
+              >
+                {showToken ? "Hide" : "Show"}
+              </Button>
+            )}
+
+            {extensionToken && (
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  await navigator.clipboard.writeText(extensionToken);
+
+                  toast.success("Extension token copied");
+                }}
+              >
+                Copy
+              </Button>
+            )}
+
+            <Button onClick={handleGenerateToken}>
+              {extensionToken ? "Regenerate Token" : "Generate Token"}
+            </Button>
+          </div>
+        </section>
         {/* ================= PREFERENCES ================= */}
         <section className="space-y-6 relative">
           <b
