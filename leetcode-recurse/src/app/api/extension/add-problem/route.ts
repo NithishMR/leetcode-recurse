@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     // ==========================
     const body = await req.json();
     console.log("body", body);
-    const { problemUrl, source } = body;
+    const { problemUrl, difficulty } = body;
 
     if (!problemUrl) {
       return NextResponse.json(
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Temporary until difficulty extraction is implemented
-    const difficulty = "easy";
+    // const difficulty = "easy";
 
     // ==========================
     // Duplicate Check
