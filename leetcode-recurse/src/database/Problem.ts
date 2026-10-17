@@ -51,6 +51,16 @@ ProblemSchema.index({ userId: 1, status: 1 });
 ProblemSchema.index({ userId: 1, difficulty: 1 });
 ProblemSchema.index({ userId: 1, source: 1 });
 
+// Prevent duplicate problems for the same user
+ProblemSchema.index(
+  {
+    userId: 1,
+    problemUrl: 1,
+  },
+  {
+    unique: true,
+  },
+);
 const Problem =
   mongoose.models.Problem || mongoose.model("Problem", ProblemSchema);
 
