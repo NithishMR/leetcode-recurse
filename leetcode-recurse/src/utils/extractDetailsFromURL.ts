@@ -4,7 +4,7 @@ type ExtractedProblemDetails = {
 };
 
 export default function extractDetailsfromURl(
-  url: string
+  url: string,
 ): ExtractedProblemDetails | null {
   try {
     const parsedUrl = new URL(url);
@@ -14,8 +14,11 @@ export default function extractDetailsfromURl(
 
     // ---- LeetCode ----
     if (hostname === "leetcode.com") {
-      // Expected format: /problems/two-sum/
-      const match = parsedUrl.pathname.match(/^\/problems\/([^/]+)\/?$/);
+      // Accepts:
+      // /problems/two-sum/
+      // /problems/two-sum/submissions/2194762410/
+
+      const match = parsedUrl.pathname.match(/^\/problems\/([^/]+)(?:\/.*)?$/);
 
       if (!match) return null;
 
