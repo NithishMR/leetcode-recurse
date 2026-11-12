@@ -1,5 +1,3 @@
-// src/app/api/extension/add-problem/route.ts
-
 import { NextRequest, NextResponse } from "next/server";
 
 import { connectDB } from "@/database/connection";
@@ -8,6 +6,44 @@ import Problem from "@/database/Problem";
 import ActivityLog from "@/database/ActivityLog";
 import extractDetailsfromURl from "@/utils/extractDetailsFromURL";
 
+const EXTENSION_ORIGIN = "chrome-extension://lcbkdmehkcebgnehgllekpnnfaefenaj";
+
+function getCorsHeaders(req: NextRequest) {
+  const origin = req.headers.get("origin");
+
+  const headers = new Headers();
+
+  if (origin === EXTENSION_ORIGIN) {
+    headers.set("Access-Control-Allow-Origin", EXTENSION_ORIGIN);
+    headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    headers.set("Access-Control-Max-Age", "86400");
+    headers.set("Vary", "Origin");
+  }
+
+  return headers;
+}
+
+function jsonResponse(req: NextRequest, body: object, status: number) {
+  return NextResponse.json(body, {
+    status,
+    headers: getCorsHeaders(req),
+  });
+}
+
+// ==========================
+// Handle CORS Preflight
+// ==========================
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, {
+    status: 204,
+    headers: getCorsHeaders(req),
+  });
+}
+
+// ==========================
+// Add Problem
+// ==========================
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
@@ -18,12 +54,13 @@ export async function POST(req: NextRequest) {
     const authHeader = req.headers.get("authorization");
 
     if (!authHeader?.startsWith("Bearer ")) {
-      return NextResponse.json(
+      return jsonResponse(
+        req,
         {
           success: false,
           error: "Missing authorization token",
         },
-        { status: 401 },
+        401,
       );
     }
 
@@ -34,12 +71,13 @@ export async function POST(req: NextRequest) {
     }).select("_id name email googleAccessToken wantCalendarReminder");
 
     if (!user) {
-      return NextResponse.json(
+      return jsonResponse(
+        req,
         {
           success: false,
           error: "Invalid extension token",
         },
-        { status: 401 },
+        401,
       );
     }
 
@@ -47,21 +85,54 @@ export async function POST(req: NextRequest) {
     // Read Body
     // ==========================
     const body = await req.json();
-    console.log("body", body);
-    const { problemUrl, difficulty } = body;
 
-    if (!problemUrl) {
-      return NextResponse.json(
+    console.log("Extension submission received:", {
+      problemUrl: body.problemUrl,
+      difficulty: body.difficulty,
+      language: body.language,
+    });
+
+    const { problemUrl } = body;
+
+    const difficulty = body.difficulty?.toLowerCase();
+
+    if (!problemUrl || !difficulty) {
+      return jsonResponse(
+        req,
         {
           success: false,
           error: "Missing required fields",
         },
-        { status: 400 },
+        400,
       );
     }
 
-    // Temporary until difficulty extraction is implemented
-    // const difficulty = "easy";
+    if (!["easy", "medium", "hard"].includes(difficulty)) {
+      return jsonResponse(
+        req,
+        {
+          success: false,
+          error: "Invalid problem difficulty",
+        },
+        400,
+      );
+    }
+
+    // ==========================
+    // Extract Problem Name
+    // ==========================
+    const problemName = extractDetailsfromURl(problemUrl)?.titleSlug;
+
+    if (!problemName) {
+      return jsonResponse(
+        req,
+        {
+          success: false,
+          error: "Could not extract problem name from URL",
+        },
+        400,
+      );
+    }
 
     // ==========================
     // Duplicate Check
@@ -72,12 +143,13 @@ export async function POST(req: NextRequest) {
     });
 
     if (existingProblem) {
-      return NextResponse.json(
+      return jsonResponse(
+        req,
         {
           success: false,
           error: "Problem already tracked",
         },
-        { status: 409 },
+        409,
       );
     }
 
@@ -92,8 +164,6 @@ export async function POST(req: NextRequest) {
 
     nextReviewDate.setUTCDate(nextReviewDate.getUTCDate() + 7);
 
-    //get problem name
-    const problemName = extractDetailsfromURl(problemUrl)?.titleSlug;
     // ==========================
     // Create Problem
     // ==========================
@@ -109,7 +179,7 @@ export async function POST(req: NextRequest) {
       timesSolved: 1,
       status: "active",
     });
-    console.log(problem);
+
     // ==========================
     // Calendar Event
     // ==========================
@@ -128,7 +198,7 @@ export async function POST(req: NextRequest) {
         problem.calendarEventId = event.id;
         await problem.save();
       } catch (err) {
-        console.error("Calendar creation failed", err);
+        console.error("Calendar creation failed:", err);
       }
     }
 
@@ -160,49 +230,57 @@ export async function POST(req: NextRequest) {
 
       await ActivityLog.deleteMany({
         _id: {
-          $in: oldestLogs.map((l) => l._id),
+          $in: oldestLogs.map((log) => log._id),
         },
       });
     }
 
-    return NextResponse.json(
+    return jsonResponse(
+      req,
       {
         success: true,
         message: "Problem added successfully",
         problem,
       },
-      { status: 201 },
+      201,
     );
   } catch (err: any) {
     console.error("POST /api/extension/add-problem error:", err);
 
-    // Handles unique index race condition
     if (err.code === 11000) {
-      return NextResponse.json(
+      return jsonResponse(
+        req,
         {
           success: false,
           error: "Problem already tracked",
         },
-        { status: 409 },
+        409,
       );
     }
 
-    return NextResponse.json(
+    return jsonResponse(
+      req,
       {
         success: false,
         error: "Internal server error",
       },
-      { status: 500 },
+      500,
     );
   }
 }
 
+// ==========================
+// Date Helper
+// ==========================
 function toUTCMidnight(date: Date) {
   return new Date(
     Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
   );
 }
 
+// ==========================
+// Google Calendar Helper
+// ==========================
 async function createCalendarEvent({
   accessToken,
   title,
@@ -235,14 +313,9 @@ async function createCalendarEvent({
           dateTime: endTime,
           timeZone: "Asia/Kolkata",
         },
-
-        // 🔔 THIS IS THE REMINDER PART
         reminders: {
           useDefault: false,
-          overrides: [
-            { method: "popup", minutes: 30 }, // in-app notification
-            // { method: "email", minutes: 60 }, // email reminder
-          ],
+          overrides: [{ method: "popup", minutes: 30 }],
         },
       }),
     },
